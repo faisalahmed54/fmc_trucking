@@ -7,7 +7,10 @@ const LANDING = {
 	ADDCUSTOMER: lazy(() => import('../pages/AddCustomer')),
 	DASHBOARD_BOOKING: lazy(() => import('../pages/dashboard/DashboardBookingPage')),
 	SUMMARY: lazy(() => import('../pages/SummaryPage')),
+	BUILDLOAD: lazy(() => import('../pages/BuildLoad')),
+	VIEWLOAD: lazy(() => import('../pages/ViewLoad')),
 };
+
 const SINGLE = {
 	BOXED: lazy(() => import('../pages/presentation/single-pages/SingleBoxedPage')),
 	FLUID: lazy(() => import('../pages/presentation/single-pages/SingleFluidPage')),
@@ -186,6 +189,16 @@ const presentation = [
 	{
 		path: dashboardMenu.addCustomer.path,
 		element: <LANDING.ADDCUSTOMER />,
+		exact: true,
+	},
+	{
+		path: dashboardMenu.loads.subMenu.addLoad.path,
+		element: <LANDING.BUILDLOAD />,
+		exact: true,
+	},
+	{
+		path: dashboardMenu.loads.subMenu.viewLoad.path,
+		element: <LANDING.VIEWLOAD />,
 		exact: true,
 	},
 	{

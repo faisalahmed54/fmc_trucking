@@ -45,6 +45,26 @@ export const dashboardMenu = {
 		icon: 'emoji_transportation',
 		subMenu: null,
 	},
+	loads: {
+		id: 'loadsMenu',
+		text: 'Loads',
+		path: 'loads',
+		icon: 'emoji_transportation',
+		subMenu: {
+			viewLoad:{
+			id: 'viewLoad',
+				text: 'View Loads',
+				path: 'loads/view-load',
+				icon: 'ViewArray',
+		},
+		addLoad:{
+			id: 'addLoad',
+				text: 'Build a Load',
+				path: 'loads/add-load',
+				icon: 'ViewArray',
+		},
+	},
+	},
 	dashboardBooking: {
 		id: 'dashboard-booking',
 		text: 'Dashboard Booking',

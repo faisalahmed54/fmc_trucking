@@ -45,7 +45,7 @@ import { toast } from 'react-toastify';
 import showNotification from '../components/extras/showNotification';
 import moment from 'moment';
 
-const CustomersList = () => {
+const ViewLoad = () => {
 	//States
 	const [customerPassword, setCustomerPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
@@ -626,4 +626,4 @@ const CustomersList = () => {
 	);
 };
 
-export default CustomersList;
+export default ViewLoad;

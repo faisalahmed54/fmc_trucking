@@ -2,6 +2,8 @@ import React from 'react';
 import { componentsMenu, dashboardMenu, demoPages, layoutMenu } from '../menu';
 import DashboardHeader from '../pages/common/Headers/DashboardHeader';
 import AddCustomer from '../pages/AddCustomer';
+import BuildLoad from '../pages/BuildLoad';
+import ViewLoad from '../pages/ViewLoad';
 import DashboardBookingHeader from '../pages/common/Headers/DashboardBookingHeader';
 import ProfilePageHeader from '../pages/common/Headers/ProfilePageHeader';
 import SummaryHeader from '../pages/common/Headers/SummaryHeader';
@@ -25,6 +27,7 @@ const headers = [
 	{ path: demoPages.page404.path, element: null, exact: true },
 	{ path: demoPages.knowledge.subMenu.grid.path, element: null, exact: true },
 	{ path: dashboardMenu.dashboard.path, element: <DashboardHeader />, exact: true },
+
 	{ path: dashboardMenu.addCustomer.path, element: null, exact: true },
 	{
 		path: demoPages.projectManagement.subMenu.list.path,
@@ -67,6 +70,7 @@ const headers = [
 		element: <DashboardBookingHeader />,
 		exact: true,
 	},
+
 	{
 		path: demoPages.singlePages.subMenu.fluidSingle.path,
 		element: <ProfilePageHeader />,
