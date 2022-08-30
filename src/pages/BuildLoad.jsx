@@ -164,6 +164,25 @@ const truckStatusesObj = {
 	16: 'Empty',
 	17: 'Driver Paid',
 };
+const commodityObj = {
+	1: 'Dry Goods (Food)',
+	2: 'Dry Goods (General)',
+	3: 'Chemicals',
+	4: 'Explosives',
+	5: 'Firearms/Ammunition',
+	6: 'Hazardous Materials',
+	7: 'Oil/Petrolium',
+	8: 'Alcohol',
+	10: 'Antiques/Works of Art',
+	11: 'Cash,Checks,Currency',
+	12: 'Consumer Electronics',
+	13: 'Jewerly',
+	14: 'Tobacco Products',
+	15: 'Tanker Freight',
+	16: 'Live Animals',
+	17: 'Refrigerated (Food)',
+	18: 'Refrigerated (General)',
+};
 const BuildLoad = () => {
 	Object.keys(loadStatusesObj).map((u) => {
 		console.log(loadStatusesObj[u]);
@@ -188,6 +207,8 @@ const BuildLoad = () => {
 		initialValues: {
 			loadStatus: '',
 			truckStatus: '',
+			commodity: '',
+			loadReference: '',
 			lastName: 'Doe',
 			displayName: 'johndoe',
 			emailAddress: 'johndoe@site.com',
@@ -455,6 +476,112 @@ const BuildLoad = () => {
 														/>
 													</FormGroup>
 												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='commodity'
+														label='Commodity Status'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Commodity'
+															onChange={formik.handleChange}
+															value={formik.values.commodity}
+															isValid={formik.isValid}
+															isTouched={formik.touched.commodity}
+															invalidFeedback={
+																formik.errors.commodity
+															}>
+															{Object.keys(commodityObj).map((u) => (
+																// @ts-ignore
+																<Option
+																	key={commodityObj[u]}
+																	value={commodityObj[u]}>
+																	{
+																		// @ts-ignore
+																		`${commodityObj[u]}`
+																	}
+																</Option>
+															))}
+														</Select>
+													</FormGroup>
+													<FormGroup
+														id='weight'
+														label='Weight in lbs'
+														isFloating>
+														<Input
+															placeholder='Weight in lbs'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.weight}
+															isValid={formik.isValid}
+															isTouched={formik.touched.weight}
+															invalidFeedback={formik.errors.weight}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-4'>
+													<FormGroup
+														id='declaredLoad'
+														label='Declared Load Value'
+														isFloating>
+														<Input
+															placeholder='Declared Load Value'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.declaredLoad}
+															isValid={formik.isValid}
+															isTouched={formik.touched.declaredLoad}
+															invalidFeedback={
+																formik.errors.declaredLoad
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+													<FormGroup
+														id='loadSize'
+														label='Load Size'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Load Size'
+															onChange={formik.handleChange}
+															value={formik.values.loadSize}
+															isValid={formik.isValid}
+															isTouched={formik.touched.loadSize}
+															invalidFeedback={
+																formik.errors.loadSize
+															}>
+															<Option key={1} value='Full Load'>
+																Full Load
+															</Option>
+															<Option key={2} value='Full Load'>
+																Partial Load
+															</Option>
+														</Select>
+													</FormGroup>
+
+													<FormGroup
+														id='goods'
+														label='New or Used Goods'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select New or Used Goods'
+															onChange={formik.handleChange}
+															value={formik.values.goods}
+															isValid={formik.isValid}
+															isTouched={formik.touched.goods}
+															invalidFeedback={formik.errors.goods}>
+															<Option key={1} value='Full Load'>
+																New
+															</Option>
+															<Option key={2} value='Full Load'>
+																Used
+															</Option>
+														</Select>
+													</FormGroup>
+												</div>
 											</div>
 										</CardBody>
 									</Card>
@@ -469,46 +596,199 @@ const BuildLoad = () => {
 											<div className='row g-4'>
 												<div className='col-12'>
 													<FormGroup
-														id='phoneNumber'
-														label='Phone Number'
+														id='equipmentType'
+														label='Equipment Type'
 														isFloating>
-														<Input
-															placeholder='Phone Number'
-															type='tel'
-															autoComplete='tel'
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Equipment Type'
 															onChange={formik.handleChange}
-															onBlur={formik.handleBlur}
-															value={formik.values.phoneNumber}
+															value={formik.values.equipmentType}
 															isValid={formik.isValid}
-															isTouched={formik.touched.phoneNumber}
+															isTouched={formik.touched.equipmentType}
 															invalidFeedback={
-																formik.errors.phoneNumber
-															}
-															validFeedback='Looks good!'
-														/>
+																formik.errors.equipmentType
+															}>
+															{Object.keys(commodityObj).map((u) => (
+																// @ts-ignore
+																<Option
+																	key={commodityObj[u]}
+																	value={commodityObj[u]}>
+																	{
+																		// @ts-ignore
+																		`${commodityObj[u]}`
+																	}
+																</Option>
+															))}
+														</Select>
 													</FormGroup>
 												</div>
 												<div className='col-12'>
 													<FormGroup
-														id='emailAddress'
-														label='Email address'
+														id='equipmentLength'
+														label='Equipment Length'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Equipment Length'
+															onChange={formik.handleChange}
+															value={formik.values.equipmentLength}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.equipmentLength
+															}
+															invalidFeedback={
+																formik.errors.equipmentLength
+															}>
+															{Object.keys(commodityObj).map((u) => (
+																// @ts-ignore
+																<Option
+																	key={commodityObj[u]}
+																	value={commodityObj[u]}>
+																	{
+																		// @ts-ignore
+																		`${commodityObj[u]}`
+																	}
+																</Option>
+															))}
+														</Select>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='temperature'
+														label='Temperature'
 														isFloating>
 														<Input
-															type='email'
-															placeholder='Email address'
-															autoComplete='email'
+															placeholder='Temperature'
 															onChange={formik.handleChange}
 															onBlur={formik.handleBlur}
-															value={formik.values.emailAddress}
+															value={formik.values.temperature}
 															isValid={formik.isValid}
-															isTouched={formik.touched.emailAddress}
+															isTouched={formik.touched.temperature}
 															invalidFeedback={
-																formik.errors.emailAddress
+																formik.errors.temperature
 															}
 															validFeedback='Looks good!'
 														/>
 													</FormGroup>
 												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='containerNumber'
+														label='Intermodal/Dray Container Number'
+														isFloating>
+														<Input
+															placeholder='Intermodal/Dray Container Number'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.containerNumber}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.containerNumber
+															}
+															invalidFeedback={
+																formik.errors.containerNumber
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='lastFreeDay'
+														label='Last Free Day'
+														isFloating>
+														<Input
+															type='date'
+															placeholder='Last Free Day'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.lastFreeDay}
+															isValid={formik.isValid}
+															isTouched={formik.touched.lastFreeDay}
+															invalidFeedback={
+																formik.errors.lastFreeDay
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+											</div>
+										</CardBody>
+									</Card>
+									<Card className='mb-0'>
+										<CardHeader>
+											<CardLabel icon='MarkunreadMailbox' iconColor='success'>
+												<CardTitle>Contact Information</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody className='pt-0'>
+											<div className='row g-4'>
+												<div className='col-12'>
+													<FormGroup
+														id='publicLoadNote'
+														label='Public Load Note'
+														isFloating
+														formText='* This note is public and will appear in the Load Confirmation.'>
+														<Textarea
+															placeholder='Public Load Note'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.publicLoadNote}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.publicLoadNote
+															}
+															invalidFeedback={
+																formik.errors.publicLoadNote
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+											</div>
+											<div className='col-12'>
+												<FormGroup
+													id='privateLoadNote'
+													label='Private Load Note'
+													isFloating
+													formText='* This note is private and viewable only by your organization.'>
+													<Textarea
+														placeholder='Private Load Note'
+														onChange={formik.handleChange}
+														onBlur={formik.handleBlur}
+														value={formik.values.privateLoadNote}
+														isValid={formik.isValid}
+														isTouched={formik.touched.privateLoadNote}
+														invalidFeedback={
+															formik.errors.privateLoadNote
+														}
+														validFeedback='Looks good!'
+													/>
+												</FormGroup>
+											</div>
+											<div className='col-12'>
+												<FormGroup
+													id='loadPostingComments'
+													label='Load Posting Notes/Comments'
+													isFloating
+													formText='*  The text entered in this field will be sent as the load notes/comments when posted to public load sources such as Truckstop.com and 123 Loadboard.'>
+													<Textarea
+														placeholder='Load Posting Notes/Comments'
+														onChange={formik.handleChange}
+														onBlur={formik.handleBlur}
+														value={formik.values.loadPostingComments}
+														isValid={formik.isValid}
+														isTouched={
+															formik.touched.loadPostingComments
+														}
+														invalidFeedback={
+															formik.errors.loadPostingComments
+														}
+														validFeedback='Looks good!'
+													/>
+												</FormGroup>
 											</div>
 										</CardBody>
 									</Card>
