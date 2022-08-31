@@ -44,6 +44,7 @@ import { firestoredb } from '../firebase';
 import { toast } from 'react-toastify';
 import showNotification from '../components/extras/showNotification';
 import moment from 'moment';
+import { Textarea } from '../components/icon/bootstrap';
 
 const CustomersList = () => {
 	//States
@@ -58,6 +59,13 @@ const CustomersList = () => {
 	const [state, setState] = useState('');
 	const [zip, setZip] = useState('');
 	const [customerType, setCustomerType] = useState('');
+	const [creditLimit, setcreditLimit] = useState('');
+	const [avaliableCredit, setavaliableCredit] = useState('');
+	const [mcNumber, setmcNumber] = useState('');
+	const [usDotNumber, setusDotNumber] = useState('');
+	const [Fax, setFax] = useState('');
+	const [telephone, settelephone] = useState('');
+	const [notes, setnotes] = useState('');
 
 	//Data from database
 	const [customerData, setCustomerData] = useState([]);
@@ -173,6 +181,12 @@ const CustomersList = () => {
 					state: state,
 					zip: zip,
 					type: customerType,
+					creditLimit: creditLimit,
+					avaliableCredit: avaliableCredit,
+					mcNumber: mcNumber,
+					usDotNumber: usDotNumber,
+					Fax: Fax,
+					telephone: telephone,
 				})
 					.then((resp) => {
 						console.log(resp);
@@ -547,7 +561,76 @@ const CustomersList = () => {
 								value={customerType}
 							/>
 						</FormGroup>
-
+						<FormGroup id='creditLimit' label='Credit Limit' className='col-md-6'>
+							<Input
+								placeholder='Credit Limit'
+								onChange={(e) => {
+									setcreditLimit(e.target.value);
+								}}
+								value={creditLimit}
+							/>
+						</FormGroup>
+						<FormGroup
+							id='avaliableCredit'
+							label='Available Credit'
+							className='col-md-6'>
+							<Input
+								placeholder='Available Credit'
+								onChange={(e) => {
+									setavaliableCredit(e.target.value);
+								}}
+								value={avaliableCredit}
+							/>
+						</FormGroup>
+						<FormGroup id='mcNumber' label='MC/FF/MX Number' className='col-md-6'>
+							<Input
+								placeholder='MC/FF/MX Number'
+								onChange={(e) => {
+									setmcNumber(e.target.value);
+								}}
+								value={mcNumber}
+							/>
+						</FormGroup>
+						<FormGroup id='usDotNumber' label='USDOT Number' className='col-md-6'>
+							<Input
+								placeholder='USDOT Number'
+								onChange={(e) => {
+									setusDotNumber(e.target.value);
+								}}
+								value={usDotNumber}
+							/>
+						</FormGroup>
+						<FormGroup id='telephone' label='Telephone & Ext.' className='col-md-6'>
+							<Input
+								placeholder='Telephone & Ext.'
+								onChange={(e) => {
+									settelephone(e.target.value);
+								}}
+								value={telephone}
+							/>
+						</FormGroup>
+						<FormGroup id='fax' label='Fax' className='col-md-6'>
+							<Input
+								placeholder='Fax'
+								onChange={(e) => {
+									setFax(e.target.value);
+								}}
+								value={Fax}
+							/>
+						</FormGroup>
+						<FormGroup
+							id='notes'
+							label='Notes'
+							className='col-md-6'
+							formText='* This note used to add customer specific notes to the load notes on your load documents when this customer is added to a load.'>
+							<Textarea
+								placeholder='Notes'
+								onChange={(e) => {
+									setnotes(e.target.value);
+								}}
+								value={notes}
+							/>
+						</FormGroup>
 						<div className='col-md-6'>
 							<Card className='rounded-1 mb-0'>
 								<CardHeader>

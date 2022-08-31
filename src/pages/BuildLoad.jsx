@@ -1,6 +1,6 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import Card, {
@@ -36,6 +36,9 @@ import Icon from '../components/icon/Icon';
 import { demoPages } from '../menu';
 import Option from '../components/bootstrap/Option';
 import Textarea from '../components/bootstrap/forms/Textarea';
+import { firestoredb } from '../firebase';
+import { Award } from '../components/icon/bootstrap';
+import { addDoc, collection, doc, getDocs, query, setDoc } from 'firebase/firestore';
 
 const PreviewItem = (props) => {
 	return (
@@ -184,16 +187,15 @@ const commodityObj = {
 	18: 'Refrigerated (General)',
 };
 const BuildLoad = () => {
-	Object.keys(loadStatusesObj).map((u) => {
-		console.log(loadStatusesObj[u]);
-	});
-
 	const navigate = useNavigate();
+	const [customerData, setCustomerData] = useState([]);
 
 	const TABS = {
 		ACCOUNT_DETAIL: 'Load Details',
 		PASSWORD: 'Password',
 		MY_WALLET: 'My Wallet',
+		CUSTOMER_INFO: 'Customer Info',
+		CARRIER_INFO: 'Carrier Info',
 	};
 	const [activeTab, setActiveTab] = useState(TABS.ACCOUNT_DETAIL);
 
@@ -205,10 +207,51 @@ const BuildLoad = () => {
 
 	const formik = useFormik({
 		initialValues: {
+			//load info
 			loadStatus: '',
 			truckStatus: '',
+			loaderBranch: '',
 			commodity: '',
 			loadReference: '',
+			declaredLoad: '',
+			loadSize: '',
+			goods: '',
+			equipmentType: '',
+			equipmentLength: '',
+			temperature: '',
+			containerNumber: '',
+			lastFreeDay: '',
+			publicLoadNote: '',
+			privateLoadNote: '',
+			loadPostingComments: '',
+			//load info end
+
+			//customer info
+			getCustomer: '',
+			customerAddress: '',
+			docketNumber: '',
+			usdotNumber: '',
+			creditLimit: '',
+			availableCredit: '',
+			customerLoadNotes: '',
+			contactPhone: '',
+			contactEmail: '',
+			//customer info end
+
+			//Carrier info
+			getCarrierCustomer: '',
+			carrierAddress: '',
+			carrierdocketNumber: '',
+			carrierusdotNumber: '',
+			carrierPrimaryContact: '',
+			customerCarrierLoadNotes: '',
+			carriercontactPhone: '',
+			carriercontactEmail: '',
+			carrierDriver: '',
+			getPowerUnit: '',
+			getTrailer: '',
+			//Carrier info end
+
 			lastName: 'Doe',
 			displayName: 'johndoe',
 			emailAddress: 'johndoe@site.com',
@@ -223,6 +266,8 @@ const BuildLoad = () => {
 		},
 		validate,
 		onSubmit: () => {
+			console.log('show');
+
 			showNotification(
 				<span className='d-flex align-items-center'>
 					<Icon icon='Info' size='lg' className='me-1' />
@@ -250,7 +295,84 @@ const BuildLoad = () => {
 			);
 		},
 	});
+	const saveLoadToDatabase = async () => {
+		let loadInformation = {
+			truckStatus: formik.values.truckStatus,
+			loadStatus: formik.values.loadStatus,
+			loaderBranch: formik.values.loaderBranch,
+			commodity: formik.values.commodity,
+			loadReference: formik.values.loadReference,
+			declaredLoad: formik.values.declaredLoad,
+			loadSize: formik.values.loadSize,
+			goods: formik.values.goods,
+		};
+		let customerInformation = {
+			getCustomer: formik.values.getCustomer,
+			customerAddress: formik.values.customerAddress,
+			docketNumber: formik.values.docketNumber,
+			usdotNumber: formik.values.usdotNumber,
+			creditLimit: formik.values.creditLimit,
+			availableCredit: formik.values.availableCredit,
+			customerLoadNotes: formik.values.customerLoadNotes,
+			contactPhone: formik.values.contactPhone,
+			contactEmail: formik.values.contactEmail,
+		};
+		let carrierInformation = {
+			getCarrierCustomer: formik.values.getCarrierCustomer,
+			carrierAddress: formik.values.carrierAddress,
+			carrierdocketNumber: formik.values.carrierdocketNumber,
+			carrierusdotNumber: formik.values.carrierusdotNumber,
+			carrierPrimaryContact: formik.values.carrierPrimaryContact,
+			customerCarrierLoadNotes: formik.values.customerCarrierLoadNotes,
+			carriercontactPhone: formik.values.carriercontactPhone,
+			carriercontactEmail: formik.values.carriercontactEmail,
+			carrierDriver: formik.values.carrierDriver,
+			getPowerUnit: formik.values.getPowerUnit,
+			getTrailer: formik.values.getTrailer,
+		};
+		console.log(loadInformation);
+		console.log(customerInformation);
+		console.log(carrierInformation);
+		let loaderInfo = {
+			loadInformation: loadInformation,
+			customerInformation: customerInformation,
+			carrierInformation: carrierInformation,
+		};
+		const messageRef = collection(firestoredb, 'Loaders');
+		// await messageRef.collection.add(loadInformation);
+		await addDoc(collection(firestoredb, 'Loaders'), loaderInfo)
+			.then(async (docRef) => {
+				console.log('Document has been added successfully');
+				console.log(docRef);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+		// await setDoc(doc(firestoredb, 'customers'), loadInformation);
+		// await messageRef.collection.add(customerInformation);
+		// await messageRef.collection.add(carrierInformation);
+	};
+	//Handlers
 
+	const getCustomerData = async () => {
+		const q = query(collection(firestoredb, 'customers'));
+		const querySnapshot = await getDocs(q);
+		if (querySnapshot.docs.length < 1) {
+			console.log('No Data');
+		} else {
+			setCustomerData([]);
+			querySnapshot.forEach((docRef) => {
+				console.log(docRef.data());
+				// doc.data() is never undefined for query doc snapshots
+				// console.log(docRef.id, ' => ', docRef.data());
+				setCustomerData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
+				// console.log(customerData);
+			});
+		}
+	};
+	useEffect(() => {
+		getCustomerData();
+	}, []);
 	return (
 		<PageWrapper title={demoPages.editPages.subMenu.editWizard.text}>
 			<SubHeader>
@@ -312,6 +434,26 @@ const BuildLoad = () => {
 											{TABS.ACCOUNT_DETAIL}
 										</Button>
 									</div>
+									<div className='col-12'>
+										<Button
+											icon='Contacts'
+											color='info'
+											className='w-100 p-3'
+											isLight={TABS.CUSTOMER_INFO !== activeTab}
+											onClick={() => setActiveTab(TABS.CUSTOMER_INFO)}>
+											{TABS.CUSTOMER_INFO}
+										</Button>
+									</div>
+									<div className='col-12'>
+										<Button
+											icon='Contacts'
+											color='info'
+											className='w-100 p-3'
+											isLight={TABS.CARRIER_INFO !== activeTab}
+											onClick={() => setActiveTab(TABS.CARRIER_INFO)}>
+											{TABS.CARRIER_INFO}
+										</Button>
+									</div>
 									{/* <div className='col-12'>
 										<Button
 											icon='LocalPolice'
@@ -336,6 +478,15 @@ const BuildLoad = () => {
 							</CardBody>
 							<CardFooter>
 								<CardFooterLeft className='w-100'>
+									<Button
+										type='submit'
+										onClick={saveLoadToDatabase}
+										icon='Save'
+										color='primary'
+										isLight
+										className='w-100 p-3'>
+										Save Loads
+									</Button>
 									{/* <Button
 										icon='Delete'
 										color='danger'
@@ -394,19 +545,6 @@ const BuildLoad = () => {
 																),
 															)}
 														</Select>
-														{/* <Input
-															placeholder='Load Status'
-															autoComplete='additional-name'
-															onChange={formik.handleChange}
-															onBlur={formik.handleBlur}
-															value={formik.values.loadStatus}
-															isValid={formik.isValid}
-															isTouched={formik.touched.loadStatus}
-															invalidFeedback={
-																formik.errors.loadStatus
-															}
-															validFeedback='Looks good!'
-														/> */}
 													</FormGroup>
 													<FormGroup
 														id='truckStatus'
@@ -440,20 +578,23 @@ const BuildLoad = () => {
 												</div>
 												<div className='col-md-6'>
 													<FormGroup
-														id='lastName'
-														label='Last Name'
+														id='loaderBranch'
+														label='Select Branch'
 														isFloating>
-														<Input
-															placeholder='Last Name'
-															autoComplete='family-name'
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Branch'
 															onChange={formik.handleChange}
-															onBlur={formik.handleBlur}
-															value={formik.values.lastName}
+															value={formik.values.loaderBranch}
 															isValid={formik.isValid}
-															isTouched={formik.touched.lastName}
-															invalidFeedback={formik.errors.lastName}
-															validFeedback='Looks good!'
-														/>
+															isTouched={formik.touched.loaderBranch}
+															invalidFeedback={
+																formik.errors.loaderBranch
+															}>
+															<Option key={1} value='Shared'>
+																Shared
+															</Option>
+														</Select>
 													</FormGroup>
 												</div>
 												<div className='col-12'>
@@ -589,7 +730,7 @@ const BuildLoad = () => {
 									<Card className='mb-0'>
 										<CardHeader>
 											<CardLabel icon='MarkunreadMailbox' iconColor='success'>
-												<CardTitle>Contact Information</CardTitle>
+												<CardTitle>Equipment Information</CardTitle>
 											</CardLabel>
 										</CardHeader>
 										<CardBody className='pt-0'>
@@ -720,7 +861,7 @@ const BuildLoad = () => {
 									<Card className='mb-0'>
 										<CardHeader>
 											<CardLabel icon='MarkunreadMailbox' iconColor='success'>
-												<CardTitle>Contact Information</CardTitle>
+												<CardTitle>Load Notes</CardTitle>
 											</CardLabel>
 										</CardHeader>
 										<CardBody className='pt-0'>
@@ -793,197 +934,605 @@ const BuildLoad = () => {
 										</CardBody>
 									</Card>
 								</WizardItem>
-								<WizardItem id='step2' title='Address'>
-									<div className='row g-4'>
-										<div className='col-lg-12'>
-											<FormGroup
-												id='addressLine'
-												label='Address Line'
-												isFloating>
-												<Input
-													onChange={formik.handleChange}
-													onBlur={formik.handleBlur}
-													value={formik.values.addressLine}
-													isValid={formik.isValid}
-													isTouched={formik.touched.addressLine}
-													invalidFeedback={formik.errors.addressLine}
-													validFeedback='Looks good!'
-												/>
-											</FormGroup>
-										</div>
-										<div className='col-lg-12'>
-											<FormGroup
-												id='addressLine2'
-												label='Address Line 2'
-												isFloating>
-												<Input
-													onChange={formik.handleChange}
-													onBlur={formik.handleBlur}
-													value={formik.values.addressLine2}
-													isValid={formik.isValid}
-													isTouched={formik.touched.addressLine2}
-													invalidFeedback={formik.errors.addressLine2}
-													validFeedback='Looks good!'
-												/>
-											</FormGroup>
-										</div>
+							</Wizard>
+						)}
+						{TABS.CUSTOMER_INFO === activeTab && (
+							<Wizard
+								isHeader
+								stretch
+								color='info'
+								noValidate
+								onSubmit={formik.handleSubmit}
+								className='shadow-3d-info'>
+								<WizardItem id='step1' title='Account Detail'>
+									<Card>
+										<CardHeader>
+											<CardLabel icon='Edit' iconColor='warning'>
+												<CardTitle>Customer Information</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody className='pt-0'>
+											<div className='row g-4'>
+												<div className='col-md-12'>
+													<FormGroup
+														id='getCustomer'
+														label='Customer'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Customer'
+															onChange={(e) => {
+																formik.handleChange(e);
+																console.log(e.target.value);
+																customerData.map((u) => {
+																	if (u.id == e.target.value) {
+																		formik.values.customerAddress =
+																			u.data.addressLine1;
+																		formik.values.usdotNumber =
+																			u.data.usDotNumber;
+																		formik.values.docketNumber =
+																			u.data.mcNumber;
 
-										<div className='col-lg-6'>
-											<FormGroup id='city' label='City' isFloating>
-												<Input
-													onChange={formik.handleChange}
-													onBlur={formik.handleBlur}
-													value={formik.values.city}
-													isValid={formik.isValid}
-													isTouched={formik.touched.city}
-													invalidFeedback={formik.errors.city}
-													validFeedback='Looks good!'
-												/>
-											</FormGroup>
-										</div>
-										<div className='col-md-3'>
-											<FormGroup id='state' label='State' isFloating>
-												<Select
-													ariaLabel='State'
-													placeholder='Choose...'
-													list={[
-														{ value: 'usa', text: 'USA' },
-														{ value: 'ca', text: 'Canada' },
-													]}
-													onChange={formik.handleChange}
-													onBlur={formik.handleBlur}
-													value={formik.values.state}
-													isValid={formik.isValid}
-													isTouched={formik.touched.state}
-													invalidFeedback={formik.errors.state}
-												/>
-											</FormGroup>
-										</div>
-										<div className='col-md-3'>
-											<FormGroup id='zip' label='Zip' isFloating>
-												<Input
-													onChange={formik.handleChange}
-													onBlur={formik.handleBlur}
-													value={formik.values.zip}
-													isValid={formik.isValid}
-													isTouched={formik.touched.zip}
-													invalidFeedback={formik.errors.zip}
-												/>
-											</FormGroup>
-										</div>
-									</div>
-								</WizardItem>
-								<WizardItem id='step3' title='Notifications'>
-									<div className='row g-4'>
-										<div className='col-12'>
-											<FormGroup>
-												<Label>Email Notifications</Label>
-												<ChecksGroup>
-													{notificationTypes.map((cat) => (
-														<Checks
-															type='switch'
-															key={cat.id}
-															id={cat.id.toString()}
-															name='emailNotification'
-															label={cat.name}
-															value={cat.id}
-															onChange={formik.handleChange}
-															checked={formik.values.emailNotification.includes(
-																cat.id.toString(),
+																		formik.values.creditLimit =
+																			u.data.creditLimit;
+
+																		formik.values.availableCredit =
+																			u.data.avaliableCredit;
+
+																		formik.values.contactPhone =
+																			u.data.telephone;
+
+																		formik.values.contactEmail =
+																			u.data.customerEmail;
+																		formik.values.customerLoadNotes =
+																			u.data.notes;
+																	}
+																});
+															}}
+															value={formik.values.getCustomer}
+															isValid={formik.isValid}
+															isTouched={formik.touched.getCustomer}
+															invalidFeedback={
+																formik.errors.getCustomer
+															}>
+															{customerData &&
+															customerData.length > 0 ? (
+																customerData.map((u) => (
+																	// @ts-ignore
+																	<Option key={u.id} value={u.id}>
+																		{
+																			// @ts-ignore
+																			`${u.data.name}`
+																		}
+																	</Option>
+																))
+															) : (
+																<></>
 															)}
-														/>
-													))}
-												</ChecksGroup>
-											</FormGroup>
-										</div>
-										<div className='col-12'>
-											<FormGroup>
-												<Label>Push Notifications</Label>
-												<ChecksGroup>
-													{notificationTypes.map((cat) => (
-														<Checks
-															type='switch'
-															key={cat.id}
-															id={cat.id.toString()}
-															name='pushNotification'
-															label={cat.name}
-															value={cat.id}
+														</Select>
+													</FormGroup>
+												</div>
+												<div className='col-md-12'>
+													<FormGroup
+														id='customerAddress'
+														label='Customer Address'
+														isFloating>
+														<Input
+															disabled
+															placeholder='Customer Address'
 															onChange={formik.handleChange}
-															checked={formik.values.pushNotification.includes(
-																cat.id.toString(),
-															)}
+															onBlur={formik.handleBlur}
+															value={formik.values.customerAddress}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.customerAddress
+															}
+															invalidFeedback={
+																formik.errors.customerAddress
+															}
+															validFeedback='Looks good!'
 														/>
-													))}
-												</ChecksGroup>
-											</FormGroup>
-										</div>
-									</div>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='docketNumber'
+														label='Docket Number'
+														isFloating>
+														<Input
+															disabled
+															placeholder='Docket Number'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.docketNumber}
+															isValid={formik.isValid}
+															isTouched={formik.touched.docketNumber}
+															invalidFeedback={
+																formik.errors.docketNumber
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='usdotNumber'
+														label='USDOT Number'
+														isFloating>
+														<Input
+															disabled
+															placeholder='USDOT Number'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.usdotNumber}
+															isValid={formik.isValid}
+															isTouched={formik.touched.usdotNumber}
+															invalidFeedback={
+																formik.errors.usdotNumber
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='creditLimit'
+														label='Credit Limit'
+														isFloating>
+														<Input
+															disabled
+															placeholder='Credit Limit'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.creditLimit}
+															isValid={formik.isValid}
+															isTouched={formik.touched.creditLimit}
+															invalidFeedback={
+																formik.errors.creditLimit
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='availableCredit'
+														label='Available Credit'
+														isFloating>
+														<Input
+															disabled
+															placeholder='Available Credit'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.availableCredit}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.availableCredit
+															}
+															invalidFeedback={
+																formik.errors.availableCredit
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-12'>
+													<FormGroup
+														id='customerLoadNotes'
+														label='Notes'
+														formText='* This note is public and will appear on your load documents.'
+														isFloating>
+														<Textarea
+															disabled
+															placeholder='Notes'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.customerLoadNotes}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.customerLoadNotes
+															}
+															invalidFeedback={
+																formik.errors.customerLoadNotes
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='contactPhone'
+														label='Contact Phone'
+														isFloating>
+														<Input
+															disabled
+															placeholder='contactPhone'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.contactPhone}
+															isValid={formik.isValid}
+															isTouched={formik.touched.contactPhone}
+															invalidFeedback={
+																formik.errors.contactPhone
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='contactEmail'
+														label='Contact Email'
+														isFloating>
+														<Input
+															disabled
+															placeholder='contactPhone'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.contactEmail}
+															isValid={formik.isValid}
+															isTouched={formik.touched.contactEmail}
+															invalidFeedback={
+																formik.errors.contactEmail
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+											</div>
+										</CardBody>
+									</Card>
 								</WizardItem>
-								<WizardItem id='step4' title='Preview'>
-									<div className='row g-3'>
-										<div className='col-9 offset-3'>
-											<h3 className='mt-4'>Account Detail</h3>
-											<h4 className='mt-4'>Personal Information</h4>
-										</div>
-										<PreviewItem
-											title='First Name'
-											value={formik.values.loadStatus}
-										/>
-										<PreviewItem
-											title='Last Name'
-											value={formik.values.lastName}
-										/>
-										<PreviewItem
-											title='Display Name'
-											value={formik.values.displayName}
-										/>
-										<div className='col-9 offset-3'>
-											<h4 className='mt-4'>Contact Information</h4>
-										</div>
-										<PreviewItem
-											title='Phone Number'
-											value={formik.values.phoneNumber}
-										/>
-										<PreviewItem
-											title='Email Address'
-											value={formik.values.emailAddress}
-										/>
-										<div className='col-9 offset-3'>
-											<h3 className='mt-4'>Address</h3>
-										</div>
-										<PreviewItem
-											title='Address Line'
-											value={formik.values.addressLine}
-										/>
-										<PreviewItem
-											title='Address Line 2'
-											value={formik.values.addressLine2}
-										/>
-										<PreviewItem title='City' value={formik.values.city} />
-										<PreviewItem title='State' value={formik.values.state} />
-										<PreviewItem title='ZIP' value={formik.values.zip} />
-										<div className='col-9 offset-3'>
-											<h4 className='mt-4'>Notification</h4>
-										</div>
-										<PreviewItem
-											title='Email Notifications'
-											value={notificationTypes.map(
-												(cat) =>
-													formik.values.emailNotification.includes(
-														cat.id.toString(),
-													) && `${cat.name}, `,
-											)}
-										/>
-										<PreviewItem
-											title='Push Notifications'
-											value={notificationTypes.map(
-												(cat) =>
-													formik.values.pushNotification.includes(
-														cat.id.toString(),
-													) && `${cat.name}, `,
-											)}
-										/>
-									</div>
+							</Wizard>
+						)}
+						{TABS.CARRIER_INFO === activeTab && (
+							<Wizard
+								isHeader
+								stretch
+								color='info'
+								noValidate
+								onSubmit={formik.handleSubmit}
+								className='shadow-3d-info'>
+								<WizardItem id='step1' title='Account Detail'>
+									<Card>
+										<CardHeader>
+											<CardLabel icon='Edit' iconColor='warning'>
+												<CardTitle>Carrier Information</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody className='pt-0'>
+											<div className='row g-4'>
+												<div className='col-md-12'>
+													<FormGroup
+														id='getCarrierCustomer'
+														label='Carrier'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Carrier'
+															onChange={formik.handleChange}
+															value={formik.values.getCarrierCustomer}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.getCarrierCustomer
+															}
+															invalidFeedback={
+																formik.errors.getCarrierCustomer
+															}>
+															{Object.keys(loadStatusesObj).map(
+																(u) => (
+																	// @ts-ignore
+																	<Option
+																		key={loadStatusesObj[u]}
+																		value={loadStatusesObj[u]}>
+																		{
+																			// @ts-ignore
+																			`${loadStatusesObj[u]}`
+																		}
+																	</Option>
+																),
+															)}
+														</Select>
+													</FormGroup>
+												</div>
+												<div className='col-md-12'>
+													<FormGroup
+														id='carrierAddress'
+														label='Carrier Address'
+														isFloating>
+														<Input
+															placeholder='Carrier Address'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.carrierAddress}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.carrierAddress
+															}
+															invalidFeedback={
+																formik.errors.carrierAddress
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='carrierdocketNumber'
+														label='Docket Number'
+														isFloating>
+														<Input
+															disabled
+															placeholder='Docket Number'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={
+																formik.values.carrierdocketNumber
+															}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.carrierdocketNumber
+															}
+															invalidFeedback={
+																formik.errors.carrierdocketNumber
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='carrierusdotNumber'
+														label='USDOT Number'
+														isFloating>
+														<Input
+															disabled
+															placeholder='USDOT Number'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.carrierusdotNumber}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.carrierusdotNumber
+															}
+															invalidFeedback={
+																formik.errors.carrierusdotNumber
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='carrierPrimaryContact'
+														label='Primary Contact'
+														isFloating>
+														<Input
+															disabled
+															placeholder='Primary Contact'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={
+																formik.values.carrierPrimaryContact
+															}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.carrierPrimaryContact
+															}
+															invalidFeedback={
+																formik.errors.carrierPrimaryContact
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='availableCredit'
+														label='Available Credit'
+														isFloating>
+														<Input
+															disabled
+															placeholder='Available Credit'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values.availableCredit}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.availableCredit
+															}
+															invalidFeedback={
+																formik.errors.availableCredit
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-12'>
+													<FormGroup
+														id='customerCarrierLoadNotes'
+														label='Notes'
+														formText='* This note is public and will appear on your load documents.'
+														isFloating>
+														<Textarea
+															disabled
+															placeholder='Notes'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={
+																formik.values
+																	.customerCarrierLoadNotes
+															}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched
+																	.customerCarrierLoadNotes
+															}
+															invalidFeedback={
+																formik.errors
+																	.customerCarrierLoadNotes
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='carriercontactPhone'
+														label='Contact Phone'
+														isFloating>
+														<Input
+															disabled
+															placeholder='contactPhone'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={
+																formik.values.carriercontactPhone
+															}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.carriercontactPhone
+															}
+															invalidFeedback={
+																formik.errors.carriercontactPhone
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+												<div className='col-md-6'>
+													<FormGroup
+														id='carriercontactEmail'
+														label='Contact Email'
+														isFloating>
+														<Input
+															disabled
+															placeholder='contactPhone'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={
+																formik.values.carriercontactEmail
+															}
+															isValid={formik.isValid}
+															isTouched={
+																formik.touched.carriercontactEmail
+															}
+															invalidFeedback={
+																formik.errors.carriercontactEmail
+															}
+															validFeedback='Looks good!'
+														/>
+													</FormGroup>
+												</div>
+											</div>
+										</CardBody>
+									</Card>
+									<Card>
+										<CardHeader>
+											<CardLabel icon='Edit' iconColor='warning'>
+												<CardTitle>
+													Driver and Equipment Information For This Load
+												</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody className='pt-0'>
+											<div className='row g-4'>
+												<div className='col-md-12'>
+													<FormGroup
+														id='carrierDriver'
+														label='Driver'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Driver'
+															onChange={formik.handleChange}
+															value={formik.values.carrierDriver}
+															isValid={formik.isValid}
+															isTouched={formik.touched.carrierDriver}
+															invalidFeedback={
+																formik.errors.carrierDriver
+															}>
+															{Object.keys(loadStatusesObj).map(
+																(u) => (
+																	// @ts-ignore
+																	<Option
+																		key={loadStatusesObj[u]}
+																		value={loadStatusesObj[u]}>
+																		{
+																			// @ts-ignore
+																			`${loadStatusesObj[u]}`
+																		}
+																	</Option>
+																),
+															)}
+														</Select>
+													</FormGroup>
+												</div>
+												<div className='col-md-12'>
+													<FormGroup
+														id='getPowerUnit'
+														label='Power Unit'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Power Unit'
+															onChange={formik.handleChange}
+															value={formik.values.getPowerUnit}
+															isValid={formik.isValid}
+															isTouched={formik.touched.getPowerUnit}
+															invalidFeedback={
+																formik.errors.getPowerUnit
+															}>
+															{Object.keys(loadStatusesObj).map(
+																(u) => (
+																	// @ts-ignore
+																	<Option
+																		key={loadStatusesObj[u]}
+																		value={loadStatusesObj[u]}>
+																		{
+																			// @ts-ignore
+																			`${loadStatusesObj[u]}`
+																		}
+																	</Option>
+																),
+															)}
+														</Select>
+													</FormGroup>
+												</div>{' '}
+												<div className='col-md-12'>
+													<FormGroup
+														id='getTrailer'
+														label='Trailer'
+														isFloating>
+														<Select
+															ariaLabel='Board select'
+															placeholder='Select Trailer'
+															onChange={formik.handleChange}
+															value={formik.values.getTrailer}
+															isValid={formik.isValid}
+															isTouched={formik.touched.getTrailer}
+															invalidFeedback={
+																formik.errors.getTrailer
+															}>
+															{Object.keys(loadStatusesObj).map(
+																(u) => (
+																	// @ts-ignore
+																	<Option
+																		key={loadStatusesObj[u]}
+																		value={loadStatusesObj[u]}>
+																		{
+																			// @ts-ignore
+																			`${loadStatusesObj[u]}`
+																		}
+																	</Option>
+																),
+															)}
+														</Select>
+													</FormGroup>
+												</div>
+											</div>
+										</CardBody>
+									</Card>
 								</WizardItem>
 							</Wizard>
 						)}
