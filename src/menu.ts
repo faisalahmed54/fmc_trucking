@@ -65,6 +65,26 @@ export const dashboardMenu = {
 		},
 	},
 	},
+	carriers: {
+		id: 'carrierMenu',
+		text: 'Carriers',
+		path: 'carrier',
+		icon: 'emoji_transportation',
+		subMenu: {
+			viewCarrier:{
+			id: 'viewLoad',
+				text: 'View Carrier',
+				path: 'carriers/view-carrier',
+				icon: 'ViewArray',
+		},
+		addNewCarrier:{
+			id: 'addLoad',
+				text: 'Add New Carrier',
+				path: 'carriers/add-new-carrier',
+				icon: 'ViewArray',
+		},
+	},
+	},
 	dashboardBooking: {
 		id: 'dashboard-booking',
 		text: 'Dashboard Booking',

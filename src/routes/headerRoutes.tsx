@@ -1,9 +1,6 @@
 import React from 'react';
 import { componentsMenu, dashboardMenu, demoPages, layoutMenu } from '../menu';
 import DashboardHeader from '../pages/common/Headers/DashboardHeader';
-import AddCustomer from '../pages/AddCustomer';
-import BuildLoad from '../pages/BuildLoad';
-import ViewLoad from '../pages/ViewLoad';
 import DashboardBookingHeader from '../pages/common/Headers/DashboardBookingHeader';
 import ProfilePageHeader from '../pages/common/Headers/ProfilePageHeader';
 import SummaryHeader from '../pages/common/Headers/SummaryHeader';

@@ -9,6 +9,8 @@ const LANDING = {
 	SUMMARY: lazy(() => import('../pages/SummaryPage')),
 	BUILDLOAD: lazy(() => import('../pages/BuildLoad')),
 	VIEWLOAD: lazy(() => import('../pages/ViewLoad')),
+	ADDNEWCARRIER: lazy(() => import('../pages/carriers/AddNewCarrier')),
+	VIEWCARRIER: lazy(() => import('../pages/carriers/ViewCarrier')),
 };
 
 const SINGLE = {
@@ -194,6 +196,16 @@ const presentation = [
 	{
 		path: dashboardMenu.loads.subMenu.addLoad.path,
 		element: <LANDING.BUILDLOAD />,
+		exact: true,
+	},
+	{
+		path: dashboardMenu.carriers.subMenu.viewCarrier.path,
+		element: <LANDING.VIEWCARRIER />,
+		exact: true,
+	},
+	{
+		path: dashboardMenu.carriers.subMenu.addNewCarrier.path,
+		element: <LANDING.ADDNEWCARRIER />,
 		exact: true,
 	},
 	{

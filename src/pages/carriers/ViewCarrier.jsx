@@ -2,51 +2,51 @@
 /* eslint-disable prettier/prettier */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
-import PageWrapper from '../layout/PageWrapper/PageWrapper';
+import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import SubHeader, {
 	SubHeaderLeft,
 	SubHeaderRight,
 	SubheaderSeparator,
-} from '../layout/SubHeader/SubHeader';
-import Page from '../layout/Page/Page';
-import { demoPages } from '../menu';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../components/bootstrap/Card';
-import { getFirstLetter, priceFormat } from '../helpers/helpers';
-import data from '../common/data/dummyCustomerData';
-import PaginationButtons, { dataPagination, PER_COUNT } from '../components/PaginationButtons';
-import Button from '../components/bootstrap/Button';
-import Icon from '../components/icon/Icon';
-import Input from '../components/bootstrap/forms/Input';
+} from '../../layout/SubHeader/SubHeader';
+import Page from '../../layout/Page/Page';
+import { demoPages } from '../../menu';
+import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import { getFirstLetter, priceFormat } from '../../helpers/helpers';
+import data from '../../common/data/dummyCustomerData';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
+import Button from '../../components/bootstrap/Button';
+import Icon from '../../components/icon/Icon';
+import Input from '../../components/bootstrap/forms/Input';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
 	DropdownToggle,
-} from '../components/bootstrap/Dropdown';
-import FormGroup from '../components/bootstrap/forms/FormGroup';
-import Checks, { ChecksGroup } from '../components/bootstrap/forms/Checks';
-import PAYMENTS from '../common/data/enumPaymentMethod';
-import useSortableData from '../hooks/useSortableData';
-import InputGroup, { InputGroupText } from '../components/bootstrap/forms/InputGroup';
-import Popovers from '../components/bootstrap/Popovers';
-import CustomerEditModal from './presentation/crm/CustomerEditModal';
-import { getColorNameWithIndex } from '../common/data/enumColors';
-import useDarkMode from '../hooks/useDarkMode';
+} from '../../components/bootstrap/Dropdown';
+import FormGroup from '../../components/bootstrap/forms/FormGroup';
+import Checks, { ChecksGroup } from '../../components/bootstrap/forms/Checks';
+import PAYMENTS from '../../common/data/enumPaymentMethod';
+import useSortableData from '../../hooks/useSortableData';
+import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
+import Popovers from '../../components/bootstrap/Popovers';
+import CustomerEditModal from './../presentation/crm/CustomerEditModal';
+import { getColorNameWithIndex } from '../../common/data/enumColors';
+import useDarkMode from '../../hooks/useDarkMode';
 import Modal, {
 	ModalBody,
 	ModalFooter,
 	ModalHeader,
 	ModalTitle,
-} from '../components/bootstrap/Modal';
-import { Label } from '../components/icon/material-icons';
-import Spinner from '../components/bootstrap/Spinner';
+} from '../../components/bootstrap/Modal';
+import { Label } from '../../components/icon/material-icons';
+import Spinner from '../../components/bootstrap/Spinner';
 import { addDoc, collection, doc, getDoc, getDocs, query, setDoc } from 'firebase/firestore';
-import { firestoredb } from '../firebase';
+import { firestoredb } from '../../firebase';
 import { toast } from 'react-toastify';
-import showNotification from '../components/extras/showNotification';
+import showNotification from '../../components/extras/showNotification';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 
-const ViewLoad = () => {
+const ViewCarrier = () => {
 	const navigate = useNavigate();
 	//States
 	const [customerPassword, setCustomerPassword] = useState('');
@@ -62,7 +62,7 @@ const ViewLoad = () => {
 	const [customerType, setCustomerType] = useState('');
 
 	//Data from database
-	const [loaderData, setLoaderData] = useState([]);
+	const [carrierData, setcarrierData] = useState([]);
 	const [count, setCount] = useState(0);
 
 	const [isLoading, setIsLoading] = useState(false);
@@ -124,17 +124,17 @@ const ViewLoad = () => {
 	//Handlers
 
 	const getCustomerData = async () => {
-		const q = query(collection(firestoredb, 'Loaders'));
+		const q = query(collection(firestoredb, 'Carriers'));
 		const querySnapshot = await getDocs(q);
 		if (querySnapshot.docs.length < 1) {
 			console.log('No Data');
 		} else {
-			setLoaderData([]);
+			setcarrierData([]);
 			querySnapshot.forEach((docRef) => {
 				// doc.data() is never undefined for query doc snapshots
 				console.log(docRef.id, ' => ', docRef.data());
-				setLoaderData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
-				// console.log(loaderData);
+				setcarrierData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
+				// console.log(carrierData);
 			});
 		}
 	};
@@ -199,8 +199,8 @@ const ViewLoad = () => {
 		getCustomerData();
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 	useEffect(() => {
-		console.log(loaderData);
-	}, [loaderData]); // eslint-disable-line react-hooks/exhaustive-deps
+		console.log(carrierData);
+	}, [carrierData]); // eslint-disable-line react-hooks/exhaustive-deps
 	return (
 		<PageWrapper title={demoPages.crm.subMenu.customersList.text}>
 			<SubHeader>
@@ -287,9 +287,9 @@ const ViewLoad = () => {
 						color='primary'
 						isLight
 						onClick={() => {
-							navigate('/loads/add-load');
+							navigate('/carriers/add-new-carrier');
 						}}>
-						New Loader
+						Add New Carrier
 					</Button>
 				</SubHeaderRight>
 			</SubHeader>
@@ -301,93 +301,42 @@ const ViewLoad = () => {
 								<table className='table table-modern table-hover'>
 									<thead>
 										<tr>
-											<th>Load Status</th>
-											<th>Customer</th>
-											<th>Carrier</th>
-											<th>Driver</th>
-											<th>Equipment</th>
-											<th>Power Unit</th>
-											<th>Trailer</th>
-											<th>Distance</th>
-											<th>Weight</th>
-											<th>Reference</th>
-											<th>Truck Status</th>
-											<th>Branch</th>
-											<th>Container</th>
-											<th>Last free day</th>
+											<th>Name</th>
+											<th>Address</th>
+											<th>MC Number</th>
+											<th>USDOT Number</th>
+											<th>Primary Contact</th>
+											<th>Primary Phone</th>
+											<th>Primary Email</th>
+											<th>Do not load</th>
+											<th>1099 Vender</th>
+											<th>Primary Insurance (BPID) Details</th>
+											<th>Primary Insurance Expiration</th>
+											<th>Cargo Insurance Details</th>
+											<th>Cargo Insurance Expiration</th>
 										</tr>
 									</thead>
 									<tbody>
-										{loaderData &&
-										loaderData !== undefined &&
-										loaderData != null &&
-										loaderData.length > 0 ? (
-											dataPagination(loaderData, currentPage, perPage).map(
+										{carrierData &&
+										carrierData !== undefined &&
+										carrierData != null &&
+										carrierData.length > 0 ? (
+											dataPagination(carrierData, currentPage, perPage).map(
 												(i) => (
 													<tr key={i.id}>
-														<td>{i.data.loadInformation.loadStatus}</td>
-														<td>
-															{i.data.customerInformation.getCustomer}
-														</td>
-														<td>
-															{
-																i.data.carrierInformation
-																	.getCarrierCustomer
-															}
-														</td>
-														<td>
-															{
-																i.data.carrierInformation
-																	.carrierDriver
-															}
-														</td>
-														<td>
-															{i.data.loadInformation.equipmentType}
-
-															{/* <div>
-																{i.data.customerMembership &&
-																i.data.customerMembership !== '' ? (
-																	moment(
-																		i.data.customerMembership,
-																	).format('ll')
-																) : (
-																	<></>
-																)}
-															</div> */}
-														</td>
-
-														<td>
-															{i.data.carrierInformation.getPowerUnit}
-														</td>
-														<td>
-															{i.data.carrierInformation.getTrailer}
-														</td>
-														<td>{i.data.loadInformation.weight}</td>
-														<td>{i.data.zip}</td>
-														<td>
-															{i.data.loadInformation.loadReference}
-														</td>
-														<td>
-															{i.data.loadInformation.truckStatus}
-														</td>
-														<td>
-															{i.data.loadInformation.loaderBranch}
-														</td>
-														<td>{i.data.zip}</td>
-														<td>
-															{' '}
-															<div>
-																{i.data.loadInformation &&
-																i.data.loadInformation !== '' ? (
-																	moment(
-																		i.data.loadInformation
-																			.lastFreeDay,
-																	).format('ll')
-																) : (
-																	<></>
-																)}
-															</div>
-														</td>
+														<td>{i.data.carrierName}</td>
+														<td>{i.data.carrierAddress}</td>
+														<td>{i.data.mcffmxNumber}</td>
+														<td>{i.data.usdotNumber}</td>
+														<td>{i.data.contactName}</td>
+														<td>{i.data.telephone}</td>
+														<td>{i.data.email}</td>
+														<td>{i.data.doNotLoad}</td>
+														<td>{i.data.vendor1099}</td>
+														<td>{i.data.primaryInsuranceDetails}</td>
+														<td>{i.data.primaryInsuranceExpiration}</td>
+														<td>{i.data.cargoInsuranceDetails}</td>
+														<td>{i.data.cargoInsuranceExpiration}</td>
 													</tr>
 												),
 											)
@@ -561,4 +510,4 @@ const ViewLoad = () => {
 	);
 };
 
-export default ViewLoad;
+export default ViewCarrier;
