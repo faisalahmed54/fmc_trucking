@@ -62,6 +62,13 @@ export const dashboardMenu = {
 				text: 'Build a Load',
 				path: 'loads/add-load',
 				icon: 'ViewArray',
+		},	
+		editLoad:{
+			id: 'editLoad',
+				text: 'Edit Load',
+				path: 'loads/edit-load',
+				icon: 'ViewArray',
+					hide: true,
 		},
 	},
 	},
@@ -72,16 +79,77 @@ export const dashboardMenu = {
 		icon: 'emoji_transportation',
 		subMenu: {
 			viewCarrier:{
-			id: 'viewLoad',
+			id: 'viewCarrier',
 				text: 'View Carrier',
 				path: 'carriers/view-carrier',
 				icon: 'ViewArray',
 		},
 		addNewCarrier:{
-			id: 'addLoad',
+			id: 'addCarrier',
 				text: 'Add New Carrier',
 				path: 'carriers/add-new-carrier',
 				icon: 'ViewArray',
+		},	
+		editCarrier:{
+			id: 'editCarrier',
+				text: 'Edit Carrier',
+				path: 'carriers/edit-carrier',
+				icon: 'ViewArray',
+					hide: true,
+		},
+	},
+	},
+	locations: {
+		id: 'locations',
+		text: 'Locations',
+		path: 'locations',
+		icon: 'emoji_transportation',
+		subMenu: {
+			viewLocation:{
+			id: 'viewLocations',
+				text: 'View Location',
+				path: 'locations/view-location',
+				icon: 'ViewArray',
+		},
+		addNewLocation:{
+			id: 'addNewLocations',
+				text: 'Add New Location',
+				path: 'locations/add-new-location',
+				icon: 'ViewArray',
+		},	
+		editLocation:{
+			id: 'editLocations',
+				text: 'Edit Location',
+				path: 'locations/edit-location',
+				icon: 'ViewArray',
+					hide: true,
+		},
+	},
+	},
+	assets: {
+		id: 'assets',
+		text: 'Assets',
+		path: 'assets',
+		icon: 'emoji_transportation',
+		subMenu: {
+			viewPowerUnits:{
+			id: 'viewPowerUnits',
+				text: 'View Power Units',
+				path: 'assets/view-powerunits',
+				icon: 'ViewArray',
+		},
+		viewTrailers:{
+			id: 'viewTrailers',
+				text: 'View Trailers',
+				path: 'assets/view-trailers',
+				icon: 'ViewArray',
+		},	
+		viewDrivers:{
+			id: 'editLocations',
+				text: 'View Drivers',
+				path: 'assets/view-drivers',
+				icon: 'ViewArray',
+				
 		},
 	},
 	},

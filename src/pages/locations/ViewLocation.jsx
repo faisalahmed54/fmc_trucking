@@ -28,7 +28,7 @@ import PAYMENTS from '../../common/data/enumPaymentMethod';
 import useSortableData from '../../hooks/useSortableData';
 import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
 import Popovers from '../../components/bootstrap/Popovers';
-import CustomerEditModal from './../presentation/crm/CustomerEditModal';
+import CustomerEditModal from '../presentation/crm/CustomerEditModal';
 import { getColorNameWithIndex } from '../../common/data/enumColors';
 import useDarkMode from '../../hooks/useDarkMode';
 import Modal, {
@@ -46,23 +46,12 @@ import showNotification from '../../components/extras/showNotification';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 
-const ViewCarrier = () => {
+const ViewLocation = () => {
 	const navigate = useNavigate();
 	//States
-	const [customerPassword, setCustomerPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-	const [customerName, setCustomerName] = useState('');
-	const [customerEmail, setCustomerEmail] = useState('');
-	const [customerMembership, setCustomerMembership] = useState('');
-	const [addressLine1, setAddressLine1] = useState('');
-	const [addressLine2, setAddressLine2] = useState('');
-	const [city, setCity] = useState('');
-	const [state, setState] = useState('');
-	const [zip, setZip] = useState('');
-	const [customerType, setCustomerType] = useState('');
 
 	//Data from database
-	const [carrierData, setcarrierData] = useState([]);
+	const [locationData, setLocationData] = useState([]);
 	const [count, setCount] = useState(0);
 
 	const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +63,6 @@ const ViewCarrier = () => {
 
 	const formik = useFormik({
 		initialValues: {
-			customerName: customerName,
 			searchInput: '',
 			payment: Object.keys(PAYMENTS).map((i) => PAYMENTS[i].name),
 			minPrice: '',
@@ -101,52 +89,31 @@ const ViewCarrier = () => {
 
 	const [editModalStatus, setEditModalStatus] = useState(false);
 
-	function checkValidation() {
-		if (!customerName || customerName == '') {
-			return false;
-		} else if (!customerPassword || customerPassword == '') {
-			return false;
-		} else if (!customerEmail || customerEmail == '') {
-			return false;
-		} else if (!customerMembership || customerMembership == '') {
-			return false;
-		} else if (!addressLine1 || addressLine1 == '') {
-			return false;
-		} else if (!addressLine2 || addressLine2 == '') {
-			return false;
-		} else if (!state || state == '') {
-			return false;
-		} else if (!zip || zip == '') {
-			return false;
-		}
-		return true;
-	}
 	//Handlers
 
-	const getCarrierData = async () => {
-		const q = query(collection(firestoredb, 'Carriers'));
+	const getLocationData = async () => {
+		const q = query(collection(firestoredb, 'Locations'));
 		const querySnapshot = await getDocs(q);
 		if (querySnapshot.docs.length < 1) {
 			console.log('No Data');
 			setIsLoading(false);
 		} else {
 			setIsLoading(false);
-			setcarrierData([]);
+			setLocationData([]);
 			querySnapshot.forEach((docRef) => {
 				// doc.data() is never undefined for query doc snapshots
 				console.log(docRef.id, ' => ', docRef.data());
-				setcarrierData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
-				// console.log(carrierData);
+				setLocationData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
 			});
 		}
 	};
 	useEffect(() => {
 		setIsLoading(true);
-		getCarrierData();
+		getLocationData();
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 	useEffect(() => {
-		console.log(carrierData);
-	}, [carrierData]); // eslint-disable-line react-hooks/exhaustive-deps
+		console.log(locationData);
+	}, [locationData]); // eslint-disable-line react-hooks/exhaustive-deps
 	return (
 		<PageWrapper title={demoPages.crm.subMenu.customersList.text}>
 			<SubHeader>
@@ -235,7 +202,7 @@ const ViewCarrier = () => {
 						onClick={() => {
 							navigate('/carriers/add-new-carrier');
 						}}>
-						Add New Carrier
+						Add New Location
 					</Button>
 				</SubHeaderRight>
 			</SubHeader>
@@ -257,40 +224,27 @@ const ViewCarrier = () => {
 										<tr>
 											<th>Name</th>
 											<th>Address</th>
-											<th>MC Number</th>
-											<th>USDOT Number</th>
+											<th>Location Type</th>
+											<th>Location Codes</th>
 											<th>Primary Contact</th>
 											<th>Primary Phone</th>
-											<th>Primary Email</th>
-											<th>Do not load</th>
-											<th>1099 Vender</th>
-											<th>Primary Insurance (BPID) Details</th>
-											<th>Primary Insurance Expiration</th>
-											<th>Cargo Insurance Details</th>
-											<th>Cargo Insurance Expiration</th>
 										</tr>
 									</thead>
 									<tbody>
-										{carrierData &&
-										carrierData !== undefined &&
-										carrierData != null &&
-										carrierData.length > 0 ? (
-											dataPagination(carrierData, currentPage, perPage).map(
+										{locationData &&
+										locationData !== undefined &&
+										locationData != null &&
+										locationData.length > 0 ? (
+											dataPagination(locationData, currentPage, perPage).map(
 												(i) => (
 													<tr key={i.id}>
-														<td>{i.data.carrierName}</td>
-														<td>{i.data.carrierAddress}</td>
-														<td>{i.data.mcffmxNumber}</td>
-														<td>{i.data.usdotNumber}</td>
+														<td>{i.data.locationName}</td>
+														<td>{i.data.locationAddress}</td>
+														<td>{i.data.locationType}</td>
+														<td>{i.data.locationCode}</td>
 														<td>{i.data.contactName}</td>
 														<td>{i.data.telephone}</td>
-														<td>{i.data.email}</td>
-														<td>{i.data.doNotLoad}</td>
-														<td>{i.data.vendor1099}</td>
-														<td>{i.data.primaryInsuranceDetails}</td>
-														<td>{i.data.primaryInsuranceExpiration}</td>
-														<td>{i.data.cargoInsuranceDetails}</td>
-														<td>{i.data.cargoInsuranceExpiration}</td>
+
 														<td>
 															<Dropdown>
 																<DropdownToggle hasIcon={false}>
@@ -306,7 +260,7 @@ const ViewCarrier = () => {
 																		<Button
 																			icon='Visibility'
 																			tag='a'
-																			to={`../${dashboardMenu.carriers.subMenu.editCarrier.path}/${i.id}`}>
+																			to={`../${dashboardMenu.locations.subMenu.editLocation.path}/${i.id}`}>
 																			View
 																		</Button>
 																	</DropdownItem>
@@ -324,7 +278,7 @@ const ViewCarrier = () => {
 							</CardBody>
 							<PaginationButtons
 								data={filteredData}
-								label='carriers'
+								label='Locations'
 								setCurrentPage={setCurrentPage}
 								currentPage={currentPage}
 								perPage={perPage}
@@ -338,4 +292,4 @@ const ViewCarrier = () => {
 	);
 };
 
-export default ViewCarrier;
+export default ViewLocation;

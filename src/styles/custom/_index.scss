@@ -16,3 +16,9 @@
 .border-transparent {
 	--#{$prefix}border-opacity: 0;
 }
+.loader{
+	position: absolute;
+    z-index: 999;
+    right: 50%;
+    bottom: 50%;
+	}

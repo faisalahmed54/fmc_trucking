@@ -2,47 +2,47 @@
 /* eslint-disable prettier/prettier */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
-import PageWrapper from '../layout/PageWrapper/PageWrapper';
+import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import SubHeader, {
 	SubHeaderLeft,
 	SubHeaderRight,
 	SubheaderSeparator,
-} from '../layout/SubHeader/SubHeader';
-import Page from '../layout/Page/Page';
-import { demoPages } from '../menu';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../components/bootstrap/Card';
-import { getFirstLetter, priceFormat } from '../helpers/helpers';
-import data from '../common/data/dummyCustomerData';
-import PaginationButtons, { dataPagination, PER_COUNT } from '../components/PaginationButtons';
-import Button from '../components/bootstrap/Button';
-import Icon from '../components/icon/Icon';
-import Input from '../components/bootstrap/forms/Input';
+} from '../../layout/SubHeader/SubHeader';
+import Page from '../../layout/Page/Page';
+import { demoPages, dashboardMenu } from '../../menu';
+import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import { getFirstLetter, priceFormat } from '../../helpers/helpers';
+import data from '../../common/data/dummyCustomerData';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
+import Button from '../../components/bootstrap/Button';
+import Icon from '../../components/icon/Icon';
+import Input from '../../components/bootstrap/forms/Input';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
 	DropdownToggle,
-} from '../components/bootstrap/Dropdown';
-import FormGroup from '../components/bootstrap/forms/FormGroup';
-import Checks, { ChecksGroup } from '../components/bootstrap/forms/Checks';
-import PAYMENTS from '../common/data/enumPaymentMethod';
-import useSortableData from '../hooks/useSortableData';
-import InputGroup, { InputGroupText } from '../components/bootstrap/forms/InputGroup';
-import Popovers from '../components/bootstrap/Popovers';
-import CustomerEditModal from './presentation/crm/CustomerEditModal';
-import { getColorNameWithIndex } from '../common/data/enumColors';
-import useDarkMode from '../hooks/useDarkMode';
+} from '../../components/bootstrap/Dropdown';
+import FormGroup from '../../components/bootstrap/forms/FormGroup';
+import Checks, { ChecksGroup } from '../../components/bootstrap/forms/Checks';
+import PAYMENTS from '../../common/data/enumPaymentMethod';
+import useSortableData from '../../hooks/useSortableData';
+import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
+import Popovers from '../../components/bootstrap/Popovers';
+import CustomerEditModal from '../presentation/crm/CustomerEditModal';
+import { getColorNameWithIndex } from '../../common/data/enumColors';
+import useDarkMode from '../../hooks/useDarkMode';
 import Modal, {
 	ModalBody,
 	ModalFooter,
 	ModalHeader,
 	ModalTitle,
-} from '../components/bootstrap/Modal';
-import { Label } from '../components/icon/material-icons';
-import Spinner from '../components/bootstrap/Spinner';
+} from '../../components/bootstrap/Modal';
+import { Label } from '../../components/icon/material-icons';
+import Spinner from '../../components/bootstrap/Spinner';
 import { addDoc, collection, doc, getDoc, getDocs, query, setDoc } from 'firebase/firestore';
-import { firestoredb } from '../firebase';
+import { firestoredb } from '../../firebase';
 import { toast } from 'react-toastify';
-import showNotification from '../components/extras/showNotification';
+import showNotification from '../../components/extras/showNotification';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 
@@ -123,7 +123,8 @@ const ViewLoad = () => {
 	}
 	//Handlers
 
-	const getCustomerData = async () => {
+	const getLoaderData = async () => {
+		setIsLoading(true);
 		const q = query(collection(firestoredb, 'Loaders'));
 		const querySnapshot = await getDocs(q);
 		if (querySnapshot.docs.length < 1) {
@@ -134,6 +135,8 @@ const ViewLoad = () => {
 				// doc.data() is never undefined for query doc snapshots
 				console.log(docRef.id, ' => ', docRef.data());
 				setLoaderData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
+				setIsLoading(false);
+
 				// console.log(loaderData);
 			});
 		}
@@ -187,7 +190,7 @@ const ViewLoad = () => {
 							</span>,
 							'Customer Added Successfully!',
 						);
-						getCustomerData();
+						getLoaderData();
 					})
 					.catch((error) => {
 						console.log(error);
@@ -196,7 +199,7 @@ const ViewLoad = () => {
 		}
 	};
 	useEffect(() => {
-		getCustomerData();
+		getLoaderData();
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		console.log(loaderData);
@@ -294,6 +297,14 @@ const ViewLoad = () => {
 				</SubHeaderRight>
 			</SubHeader>
 			<Page>
+				{isLoading && (
+					<>
+						<div className='loader'>
+							<Spinner style={{ width: '50px', height: '50px' }} isGrow />
+							<span style={{ fontSize: '20px' }}>Loading...</span>
+						</div>
+					</>
+				)}
 				<div className='row h-100'>
 					<div className='col-12'>
 						<Card stretch>
@@ -387,6 +398,28 @@ const ViewLoad = () => {
 																	<></>
 																)}
 															</div>
+														</td>
+														<td>
+															<Dropdown>
+																<DropdownToggle hasIcon={false}>
+																	<Button
+																		icon='MoreHoriz'
+																		color='dark'
+																		isLight
+																		shadow='sm'
+																	/>
+																</DropdownToggle>
+																<DropdownMenu isAlignmentEnd>
+																	<DropdownItem>
+																		<Button
+																			icon='Visibility'
+																			tag='a'
+																			to={`../${dashboardMenu.loads.subMenu.editLoad.path}/${i.id}`}>
+																			View
+																		</Button>
+																	</DropdownItem>
+																</DropdownMenu>
+															</Dropdown>
 														</td>
 													</tr>
 												),

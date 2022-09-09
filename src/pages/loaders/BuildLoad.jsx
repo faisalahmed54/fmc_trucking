@@ -13,34 +13,35 @@ import Card, {
 	CardHeader,
 	CardLabel,
 	CardTitle,
-} from '../components/bootstrap/Card';
-import Button from '../components/bootstrap/Button';
-import Wizard, { WizardItem } from '../components/Wizard';
-import FormGroup from '../components/bootstrap/forms/FormGroup';
-import Input from '../components/bootstrap/forms/Input';
-import Select from '../components/bootstrap/forms/Select';
-import Label from '../components/bootstrap/forms/Label';
-import Checks, { ChecksGroup } from '../components/bootstrap/forms/Checks';
-import PageWrapper from '../layout/PageWrapper/PageWrapper';
-import Page from '../layout/Page/Page';
+} from '../../components/bootstrap/Card';
+import Button from '../../components/bootstrap/Button';
+import Wizard, { WizardItem } from '../../components/Wizard';
+import FormGroup from '../../components/bootstrap/forms/FormGroup';
+import Input from '../../components/bootstrap/forms/Input';
+import Select from '../../components/bootstrap/forms/Select';
+import Label from '../../components/bootstrap/forms/Label';
+import Checks, { ChecksGroup } from '../../components/bootstrap/forms/Checks';
+import PageWrapper from '../../layout/PageWrapper/PageWrapper';
+import Page from '../../layout/Page/Page';
 import SubHeader, {
 	SubHeaderLeft,
 	SubHeaderRight,
 	SubheaderSeparator,
-} from '../layout/SubHeader/SubHeader';
-import Avatar from '../components/Avatar';
-import User1Webp from '../assets/img/wanna/wanna2.webp';
-import User1Img from '../assets/img/wanna/wanna2.png';
-import CommonMyWallet from './common/CommonMyWallet';
-import editPasswordValidate from './presentation/demo-pages/helper/editPasswordValidate';
-import showNotification from '../components/extras/showNotification';
-import Icon from '../components/icon/Icon';
-import { demoPages } from '../menu';
-import Option from '../components/bootstrap/Option';
-import Textarea from '../components/bootstrap/forms/Textarea';
-import { firestoredb } from '../firebase';
-import { Award } from '../components/icon/bootstrap';
+} from '../../layout/SubHeader/SubHeader';
+import Avatar from '../../components/Avatar';
+import User1Webp from '../../assets/img/wanna/wanna2.webp';
+import User1Img from '../../assets/img/wanna/wanna2.png';
+import CommonMyWallet from './../common/CommonMyWallet';
+import editPasswordValidate from './../presentation/demo-pages/helper/editPasswordValidate';
+import showNotification from '../../components/extras/showNotification';
+import Icon from '../../components/icon/Icon';
+import { demoPages } from '../../menu';
+import Option from '../../components/bootstrap/Option';
+import Textarea from '../../components/bootstrap/forms/Textarea';
+import { firestoredb } from '../../firebase';
+import { Award } from '../../components/icon/bootstrap';
 import { addDoc, collection, doc, getDocs, query, setDoc } from 'firebase/firestore';
+import Spinner from '../../components/bootstrap/Spinner';
 
 const PreviewItem = (props) => {
 	return (
@@ -154,6 +155,7 @@ const BuildLoad = () => {
 	const navigate = useNavigate();
 	const [customerData, setCustomerData] = useState([]);
 	const [carrierData, setCarrierData] = useState([]);
+	const [isLoading, setisLoading] = useState(false);
 
 	const TABS = {
 		ACCOUNT_DETAIL: 'Load Details',
@@ -262,64 +264,80 @@ const BuildLoad = () => {
 		},
 	});
 	const saveLoadToDatabase = async () => {
-		let loadInformation = {
-			truckStatus: formik.values.truckStatus,
-			loadStatus: formik.values.loadStatus,
-			loaderBranch: formik.values.loaderBranch,
-			commodity: formik.values.commodity,
-			loadReference: formik.values.loadReference,
-			declaredLoad: formik.values.declaredLoad,
-			weight: formik.values.weight,
-			loadSize: formik.values.loadSize,
-			goods: formik.values.goods,
-			equipmentType: formik.values.equipmentType,
-			equipmentLength: formik.values.equipmentLength,
-			temperature: formik.values.temperature,
-			containerNumber: formik.values.containerNumber,
-			lastFreeDay: formik.values.lastFreeDay,
-			publicLoadNote: formik.values.publicLoadNote,
-			privateLoadNote: formik.values.privateLoadNote,
-			loadPostingComments: formik.values.loadPostingComments,
-		};
-		let customerInformation = {
-			getCustomer: formik.values.getCustomer,
-			customerAddress: formik.values.customerAddress,
-			docketNumber: formik.values.docketNumber,
-			usdotNumber: formik.values.usdotNumber,
-			creditLimit: formik.values.creditLimit,
-			availableCredit: formik.values.availableCredit,
-			customerLoadNotes: formik.values.customerLoadNotes,
-			contactPhone: formik.values.contactPhone,
-			contactEmail: formik.values.contactEmail,
-		};
-		let carrierInformation = {
-			getCarrierCustomer: formik.values.getCarrierCustomer,
-			carrierAddress: formik.values.carrierAddress,
-			carrierdocketNumber: formik.values.carrierdocketNumber,
-			carrierusdotNumber: formik.values.carrierusdotNumber,
-			carrierPrimaryContact: formik.values.carrierPrimaryContact,
-			customerCarrierLoadNotes: formik.values.customerCarrierLoadNotes,
-			carriercontactPhone: formik.values.carriercontactPhone,
-			carriercontactEmail: formik.values.carriercontactEmail,
-			carrierDriver: formik.values.carrierDriver,
-			getPowerUnit: formik.values.getPowerUnit,
-			getTrailer: formik.values.getTrailer,
-		};
+		if (isLoading == true) {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon color='danger' size='lg' className='me-1' />
+					<span>Alert!</span>
+				</span>,
+				'Please wait!',
+			);
+		} else {
+			setisLoading(true);
 
-		let loaderInfo = {
-			loadInformation: loadInformation,
-			customerInformation: customerInformation,
-			carrierInformation: carrierInformation,
-		};
+			let loadInformation = {
+				truckStatus: formik.values.truckStatus,
+				loadStatus: formik.values.loadStatus,
+				loaderBranch: formik.values.loaderBranch,
+				commodity: formik.values.commodity,
+				loadReference: formik.values.loadReference,
+				declaredLoad: formik.values.declaredLoad,
+				weight: formik.values.weight,
+				loadSize: formik.values.loadSize,
+				goods: formik.values.goods,
+				equipmentType: formik.values.equipmentType,
+				equipmentLength: formik.values.equipmentLength,
+				temperature: formik.values.temperature,
+				containerNumber: formik.values.containerNumber,
+				lastFreeDay: formik.values.lastFreeDay,
+				publicLoadNote: formik.values.publicLoadNote,
+				privateLoadNote: formik.values.privateLoadNote,
+				loadPostingComments: formik.values.loadPostingComments,
+			};
+			let customerInformation = {
+				getCustomer: formik.values.getCustomer,
+				customerAddress: formik.values.customerAddress,
+				docketNumber: formik.values.docketNumber,
+				usdotNumber: formik.values.usdotNumber,
+				creditLimit: formik.values.creditLimit,
+				availableCredit: formik.values.availableCredit,
+				customerLoadNotes: formik.values.customerLoadNotes,
+				contactPhone: formik.values.contactPhone,
+				contactEmail: formik.values.contactEmail,
+			};
+			let carrierInformation = {
+				getCarrierCustomer: formik.values.getCarrierCustomer,
+				carrierAddress: formik.values.carrierAddress,
+				carrierdocketNumber: formik.values.carrierdocketNumber,
+				carrierusdotNumber: formik.values.carrierusdotNumber,
+				carrierPrimaryContact: formik.values.carrierPrimaryContact,
+				customerCarrierLoadNotes: formik.values.customerCarrierLoadNotes,
+				carriercontactPhone: formik.values.carriercontactPhone,
+				carriercontactEmail: formik.values.carriercontactEmail,
+				carrierDriver: formik.values.carrierDriver,
+				getPowerUnit: formik.values.getPowerUnit,
+				getTrailer: formik.values.getTrailer,
+			};
 
-		await addDoc(collection(firestoredb, 'Loaders'), loaderInfo)
-			.then(async (docRef) => {
-				console.log('Document has been added successfully');
-				console.log(docRef);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
+			let loaderInfo = {
+				loadInformation: loadInformation,
+				customerInformation: customerInformation,
+				carrierInformation: carrierInformation,
+			};
+
+			await addDoc(collection(firestoredb, 'Loaders'), loaderInfo)
+				.then(async (docRef) => {
+					setisLoading(false);
+					formik.resetForm();
+					console.log('Document has been added successfully');
+					console.log(docRef);
+				})
+				.catch((error) => {
+					setisLoading(false);
+
+					console.log(error);
+				});
+		}
 	};
 	//Handlers
 
@@ -373,33 +391,16 @@ const BuildLoad = () => {
 					</span>
 					<span className='text-muted'>Edit User</span> */}
 				</SubHeaderLeft>
-				<SubHeaderRight>
-					{/* <Button
-						color='dark'
-						isLight
-						icon='Add'
-						onClick={() => {
-							setActiveTab(TABS.ACCOUNT_DETAIL);
-							formik.setValues({
-								firstName: '',
-								lastName: '',
-								displayName: '',
-								emailAddress: '',
-								phoneNumber: '',
-								addressLine: '',
-								addressLine2: '',
-								city: '',
-								state: '',
-								zip: '',
-								emailNotification: [''],
-								pushNotification: [''],
-							});
-						}}>
-						Add New
-					</Button> */}
-				</SubHeaderRight>
 			</SubHeader>
 			<Page>
+				{isLoading && (
+					<>
+						<div className='loader'>
+							<Spinner style={{ width: '50px', height: '50px' }} isGrow />
+							<span style={{ fontSize: '20px' }}>Loading...</span>
+						</div>
+					</>
+				)}
 				<div className='row h-100 pb-3'>
 					<div className='col-lg-4 col-md-6'>
 						<Card stretch>

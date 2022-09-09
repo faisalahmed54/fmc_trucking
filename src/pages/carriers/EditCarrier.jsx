@@ -4,7 +4,7 @@
 /* eslint-disable react/prop-types */
 import React, { FC, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Card, {
 	CardBody,
 	CardFooter,
@@ -40,7 +40,7 @@ import Option from '../../components/bootstrap/Option';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import { firestoredb } from '../../firebase';
 import { Award } from '../../components/icon/bootstrap';
-import { addDoc, collection, doc, getDocs, query, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, query, setDoc } from 'firebase/firestore';
 import Spinner from '../../components/bootstrap/Spinner';
 
 const PreviewItem = (props) => {
@@ -137,63 +137,14 @@ const validate = (values) => {
 
 	return errors;
 };
-const loadStatusesObj = {
-	1: 'Pending',
-	2: 'Needs Carrier',
-	3: 'Needs Driver',
-	4: 'Booked-Awaiting',
-	5: 'Ready - Confirmation Signed',
-	6: 'Driver Assigned',
-	7: 'Dispatched',
-	8: 'In Transit',
-	9: 'Watch',
-	10: 'Possible Claim',
-	11: 'Delivered',
-	12: 'Completed',
-	13: 'To Be Billed',
-	14: 'Actual Claim',
-};
-const truckStatusesObj = {
-	1: 'Carrier Needs Setup',
-	2: 'Setup Packet Sent to Carrier',
-	3: 'Insurance Verfication Needed',
-	4: 'Carrier Setup Not Complete',
-	5: 'Carrier Setup Complete',
-	6: 'At Prior Load',
-	7: 'Dispatched',
-	8: 'At Pickup - Waiting',
-	9: 'At Pickup - Loading',
-	10: 'On Time',
-	11: 'Running Late',
-	12: 'At Delivery - Waiting',
-	13: 'At Delivery - Unloading',
-	14: 'Broken Down',
-	15: 'In Accident',
-	16: 'Empty',
-	17: 'Driver Paid',
-};
-const commodityObj = {
-	1: 'Dry Goods (Food)',
-	2: 'Dry Goods (General)',
-	3: 'Chemicals',
-	4: 'Explosives',
-	5: 'Firearms/Ammunition',
-	6: 'Hazardous Materials',
-	7: 'Oil/Petrolium',
-	8: 'Alcohol',
-	10: 'Antiques/Works of Art',
-	11: 'Cash,Checks,Currency',
-	12: 'Consumer Electronics',
-	13: 'Jewerly',
-	14: 'Tobacco Products',
-	15: 'Tanker Freight',
-	16: 'Live Animals',
-	17: 'Refrigerated (Food)',
-	18: 'Refrigerated (General)',
-};
-const AddNewCarrier = () => {
+
+const EditCarrier = () => {
+	const location = useLocation();
+
 	const navigate = useNavigate();
 	const [customerData, setCustomerData] = useState([]);
+	const [count, setCount] = useState();
+	const [carrierData, setCarrierData] = useState(null);
 	const [isLoading, setisLoading] = useState(false);
 
 	const TABS = {
@@ -273,6 +224,8 @@ const AddNewCarrier = () => {
 	});
 
 	const saveLoadToDatabase = async () => {
+		const result = location.pathname.split(/[.\-&=/_]/);
+
 		if (isLoading == true) {
 			showNotification(
 				<span className='d-flex align-items-center'>
@@ -323,18 +276,11 @@ const AddNewCarrier = () => {
 				);
 				setisLoading(false);
 			} else {
-				await addDoc(collection(firestoredb, 'Carriers'), carrierInformation)
+				// Edit and save document in collection "Carriers"
+				await setDoc(doc(firestoredb, 'Carriers', result[4]), carrierInformation)
 					.then(async (docRef) => {
 						console.log('Document has been added successfully');
 						console.log(docRef);
-						formik.resetForm();
-						showNotification(
-							<span className='d-flex align-items-center'>
-								<Icon icon='Info' size='lg' className='me-1' />
-								<span>Carrier Added Successfully!</span>
-							</span>,
-							"The user's password have been successfully updated.",
-						);
 						setisLoading(false);
 					})
 					.catch((error) => {
@@ -345,7 +291,59 @@ const AddNewCarrier = () => {
 		}
 	};
 	//Handlers
+	const getCarrierData = async () => {
+		const result = location.pathname.split(/[.\-&=/_]/);
+		// console.log(result[4]);
+		const docRef = doc(firestoredb, 'Carriers', result[4]);
+		const docSnap = await getDoc(docRef);
 
+		if (docSnap.exists()) {
+			console.log('Document data:', docSnap.data());
+			setCarrierData({ id: docSnap.id, data: docSnap.data() });
+		} else {
+			// doc.data() will be undefined in this case
+			console.log('No such document!');
+		}
+	};
+	useEffect(() => {
+		setisLoading(true);
+
+		getCarrierData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+	useEffect(() => {
+		if (carrierData) {
+			setCount(1);
+			console.log(carrierData);
+			//Carrier Information
+			formik.values.cargoInsuranceDetails = carrierData.data.cargoInsuranceDetails;
+			formik.values.cargoInsuranceExpiration = carrierData.data.cargoInsuranceExpiration;
+			formik.values.carrierAddress = carrierData.data.carrierAddress;
+			formik.values.carrierName = carrierData.data.carrierName;
+			formik.values.checksPayableTo = carrierData.data.checksPayableTo;
+			formik.values.contactName = carrierData.data.contactName;
+			formik.values.distanceUnit = carrierData.data.distanceUnit;
+			formik.values.doNotLoad = carrierData.data.doNotLoad;
+			formik.values.email = carrierData.data.email;
+			formik.values.mcffmxNumber = carrierData.data.mcffmxNumber;
+			formik.values.fax = carrierData.data.fax;
+			formik.values.paymentMethod = carrierData.data.paymentMethod;
+			formik.values.paymentTerms = carrierData.data.paymentTerms;
+			formik.values.primaryInsuranceDetails = carrierData.data.primaryInsuranceDetails;
+			formik.values.primaryInsuranceExpiration = carrierData.data.primaryInsuranceExpiration;
+			formik.values.privateLoadNote = carrierData.data.privateLoadNote;
+			formik.values.taxIdNumber = carrierData.data.taxIdNumber;
+			formik.values.telephone = carrierData.data.telephone;
+			formik.values.telephoneOptional = carrierData.data.telephoneOptional;
+			formik.values.temperatureUnit = carrierData.data.temperatureUnit;
+			formik.values.usdotNumber = carrierData.data.usdotNumber;
+			formik.values.vendor1099 = carrierData.data.vendor1099;
+			formik.values.weightUnit = carrierData.data.weightUnit;
+
+			setisLoading(false);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [carrierData]);
 	return (
 		<PageWrapper title={demoPages.editPages.subMenu.editWizard.text}>
 			<SubHeader>
@@ -391,14 +389,15 @@ const AddNewCarrier = () => {
 										<CardBody className='pt-0'>
 											<div className='row g-4'>
 												<div className='col-md-12'>
-													<FormGroup 
+													<FormGroup
 														id='carrierAddress'
 														label='Carrier Address'
 														isFloating
 														formText='Start typing a name or address in the box above and we will search the internet for a match. Simply select the best match and we will fill out the rest of the form below.
 														
 Premium users can type the MC, DOT, FF, or MX number. We will then auto-populate this screen for you, show carrier verification data, and display fraud alerts'>
-														<Input required
+														<Input
+															required
 															placeholder='Carrier Address'
 															onChange={formik.handleChange}
 															onBlur={formik.handleBlur}
@@ -416,7 +415,8 @@ Premium users can type the MC, DOT, FF, or MX number. We will then auto-populate
 														id='carrierName'
 														label='Carrier Name'
 														isFloating>
-														<Input required
+														<Input
+															required
 															placeholder='Carrier Name'
 															onChange={formik.handleChange}
 															value={formik.values.carrierName}
@@ -452,7 +452,8 @@ Premium users can type the MC, DOT, FF, or MX number. We will then auto-populate
 														id='checksPayableTo'
 														label='Checks payable to'
 														isFloating>
-														<Input required
+														<Input
+															required
 															placeholder='Checks payable to'
 															onChange={formik.handleChange}
 															value={formik.values.checksPayableTo}
@@ -881,4 +882,4 @@ Premium users can type the MC, DOT, FF, or MX number. We will then auto-populate
 	);
 };
 
-export default AddNewCarrier;
+export default EditCarrier;

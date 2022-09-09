@@ -7,10 +7,18 @@ const LANDING = {
 	ADDCUSTOMER: lazy(() => import('../pages/AddCustomer')),
 	DASHBOARD_BOOKING: lazy(() => import('../pages/dashboard/DashboardBookingPage')),
 	SUMMARY: lazy(() => import('../pages/SummaryPage')),
-	BUILDLOAD: lazy(() => import('../pages/BuildLoad')),
-	VIEWLOAD: lazy(() => import('../pages/ViewLoad')),
+	BUILDLOAD: lazy(() => import('../pages/loaders/BuildLoad')),
+	EDITLOAD: lazy(() => import('../pages/loaders/EditLoad')),
+	VIEWLOAD: lazy(() => import('../pages/loaders/ViewLoad')),
 	ADDNEWCARRIER: lazy(() => import('../pages/carriers/AddNewCarrier')),
 	VIEWCARRIER: lazy(() => import('../pages/carriers/ViewCarrier')),
+	EDITCARRIER: lazy(() => import('../pages/carriers/EditCarrier')),
+	ADDNEWLOCATION: lazy(() => import('../pages/locations/AddNewLocation')),
+	VIEWLOCATION: lazy(() => import('../pages/locations/ViewLocation')),
+	EDITLOCATION: lazy(() => import('../pages/locations/EditLocation')),
+	VIEWPOWERUNITS: lazy(() => import('../pages/assets/ViewPowerUnits')),
+	VIEWTRAILERS: lazy(() => import('../pages/assets/ViewTrailers')),
+	VIEWDRIVERS: lazy(() => import('../pages/assets/ViewDrivers')),
 };
 
 const SINGLE = {
@@ -188,16 +196,30 @@ const presentation = [
 		element: <LANDING.DASHBOARD />,
 		exact: true,
 	},
+	//Customers
 	{
 		path: dashboardMenu.addCustomer.path,
 		element: <LANDING.ADDCUSTOMER />,
 		exact: true,
 	},
+	//Loaders
 	{
 		path: dashboardMenu.loads.subMenu.addLoad.path,
 		element: <LANDING.BUILDLOAD />,
 		exact: true,
 	},
+	{
+		path: dashboardMenu.loads.subMenu.viewLoad.path,
+		element: <LANDING.VIEWLOAD />,
+		exact: true,
+	},
+	{
+		path: `${dashboardMenu.loads.subMenu.editLoad.path}/:id`,
+		element: <LANDING.EDITLOAD />,
+		exact: true,
+	},
+
+	//Carriers
 	{
 		path: dashboardMenu.carriers.subMenu.viewCarrier.path,
 		element: <LANDING.VIEWCARRIER />,
@@ -209,10 +231,44 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: dashboardMenu.loads.subMenu.viewLoad.path,
-		element: <LANDING.VIEWLOAD />,
+		path: `${dashboardMenu.carriers.subMenu.editCarrier.path}/:id`,
+		element: <LANDING.EDITCARRIER />,
 		exact: true,
 	},
+
+	//Locations
+	{
+		path: dashboardMenu.locations.subMenu.viewLocation.path,
+		element: <LANDING.VIEWLOCATION />,
+		exact: true,
+	},
+	{
+		path: dashboardMenu.locations.subMenu.addNewLocation.path,
+		element: <LANDING.ADDNEWLOCATION />,
+		exact: true,
+	},
+	{
+		path: `${dashboardMenu.locations.subMenu.editLocation.path}/:id`,
+		element: <LANDING.EDITLOCATION />,
+		exact: true,
+	},
+	//Assets
+	{
+		path: dashboardMenu.assets.subMenu.viewPowerUnits.path,
+		element: <LANDING.VIEWPOWERUNITS />,
+		exact: true,
+	},
+	{
+		path: dashboardMenu.assets.subMenu.viewTrailers.path,
+		element: <LANDING.VIEWTRAILERS />,
+		exact: true,
+	},
+	{
+		path: dashboardMenu.assets.subMenu.viewDrivers.path,
+		element: <LANDING.VIEWDRIVERS />,
+		exact: true,
+	},
+	//````````````````
 	{
 		path: dashboardMenu.dashboardBooking.path,
 		element: <LANDING.DASHBOARD_BOOKING />,

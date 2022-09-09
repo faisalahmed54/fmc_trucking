@@ -2,7 +2,8 @@ import React, { FC } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/icon/Icon';
-import Logo from '../../components/Logo';
+// import Logo from '../../components/Logo';
+import Logo from '../../assets/logos/commute-bridge-final-white.png';
 
 interface IBrandProps {
 	asideStatus: boolean;
@@ -14,7 +15,7 @@ const Brand: FC<IBrandProps> = ({ asideStatus, setAsideStatus }) => {
 			<div className='brand-logo'>
 				<h1 className='brand-title '>
 					<Link to='/' aria-label='Logo'>
-						<Logo height={32} />
+						<img src={Logo} style={{ height: '40px' }} />
 					</Link>
 				</h1>
 			</div>
