@@ -45,6 +45,8 @@ import { toast } from 'react-toastify';
 import showNotification from '../../components/extras/showNotification';
 import moment from 'moment';
 import Textarea from '../../components/bootstrap/forms/Textarea';
+import Option from '../../components/bootstrap/Option';
+import Select from '../../components/bootstrap/forms/Select';
 
 const ViewPowerUnits = () => {
 	//States
@@ -65,7 +67,28 @@ const ViewPowerUnits = () => {
 	const [usDotNumber, setusDotNumber] = useState('');
 	const [Fax, setFax] = useState('');
 	const [telephone, settelephone] = useState('');
+
+	//Asset States
+	const [makeModel, setmakeModel] = useState('');
+	const [powerUnitNumber, setpowerUnitNumber] = useState('');
+	const [engineType, setengineType] = useState('');
+	const [transmissionType, settransmissionType] = useState('');
+	const [fuelType, setfuelType] = useState('');
+	const [horsepower, sethorsepower] = useState('');
+	const [licensePlate, setlicensePlate] = useState('');
+	const [modelYear, setmodelYear] = useState('');
+	const [vehicleIdNumber, setvehicleIdNumber] = useState('');
+	const [assetstatus, setassetstatus] = useState('');
+	const [insuranceInformation, setinsuranceInformation] = useState('');
+	const [registeredStates, setregisteredStates] = useState('');
+	const [assetLength, setassetLength] = useState('');
+	const [assetWidth, setassetWidth] = useState('');
+	const [assetHeight, setassetHeight] = useState('');
+	const [numberOfAxles, setnumberOfAxles] = useState('');
+	const [unloadedVehicleWeight, setunloadedVehicleWeight] = useState('');
+	const [grossVehicleWeight, setgrossVehicleWeight] = useState('');
 	const [notes, setnotes] = useState('');
+	const [ownership, setownership] = useState('');
 
 	//Data from database
 	const [customerData, setCustomerData] = useState([]);
@@ -384,7 +407,7 @@ const ViewPowerUnits = () => {
 						<DropdownMenu isAlignmentEnd size='lg'>
 							<div className='container py-2'>
 								<div className='row g-3'>
-									<FormGroup label='Balance' className='col-12'>
+									<FormGroup isFloating label='Balance' className='col-12'>
 										<InputGroup>
 											<Input
 												id='minPrice'
@@ -403,7 +426,7 @@ const ViewPowerUnits = () => {
 											/>
 										</InputGroup>
 									</FormGroup>
-									<FormGroup label='Payments' className='col-12'>
+									<FormGroup isFloating label='Payments' className='col-12'>
 										<ChecksGroup>
 											{Object.keys(PAYMENTS).map((payment) => (
 												<Checks
@@ -434,7 +457,7 @@ const ViewPowerUnits = () => {
 							setCustomerDataInModal('');
 							setEditModalStatus(true);
 						}}>
-						New Customer
+						Add New Power Unit
 					</Button>
 				</SubHeaderRight>
 			</SubHeader>
@@ -454,39 +477,15 @@ const ViewPowerUnits = () => {
 								<table className='table table-modern table-hover'>
 									<thead>
 										<tr>
-											<th
-												onClick={() => requestSort('name')}
-												className='cursor-pointer text-decoration-underline'>
-												Customer{' '}
-												<Icon
-													size='lg'
-													className={getClassNamesFor('name')}
-													icon='FilterList'
-												/>
-											</th>
-											<th>Email</th>
-											<th>Membership Date</th>
-											<th
-												onClick={() => requestSort('balance')}
-												className='cursor-pointer text-decoration-underline'>
-												State
-												<Icon
-													size='lg'
-													className={getClassNamesFor('balance')}
-													icon='FilterList'
-												/>
-											</th>
-											<th
-												onClick={() => requestSort('payout')}
-												className='cursor-pointer text-decoration-underline'>
-												Zip{' '}
-												<Icon
-													size='lg'
-													className={getClassNamesFor('payout')}
-													icon='FilterList'
-												/>
-											</th>
-											<td />
+											<th>Make/Model </th>
+											<th>Power Unit Number</th>
+											<th>License Plate</th>
+											<th>License Plate Expiration</th>
+											<th>Vehicle ID Number</th>
+											<th>Ownership</th>
+											<th>Inspection Expiration</th>
+											<th>DOT Expiration</th>
+											<th>Status</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -650,191 +649,487 @@ const ViewPowerUnits = () => {
 			</Page>
 			<Modal isOpen={editModalStatus} setIsOpen={setEditModalStatus} size='xl'>
 				<ModalHeader setIsOpen={setEditModalStatus} className='p-4'>
-					<ModalTitle>New Customer</ModalTitle>
+					<ModalTitle>Power Unit Details</ModalTitle>
 				</ModalHeader>
 				<ModalBody className='px-4'>
 					<div className='row g-4'>
-						<FormGroup id='customerName' label='Name' className='col-md-6'>
-							<Input
-								isTouched={formik.touched.customerName}
-								invalidFeedback={formik.errors.customerName}
-								validFeedback='HEllo'
-								isValid={formik.isValid}
-								placeholder='Name'
-								onChange={(e) => {
-									setCustomerName(e.target.value);
-								}}
-								value={customerName}
-							/>
-						</FormGroup>
-						<FormGroup id='email' label='Email' className='col-md-6'>
-							<Input
-								type='email'
-								placeholder='Email'
-								onChange={(e) => {
-									setCustomerEmail(e.target.value);
-								}}
-								value={customerEmail}
-							/>
-						</FormGroup>
-						<FormGroup id='password' label='Password' className='col-md-6'>
-							<Input
-								placeholder='Password '
-								type='password'
-								onChange={(e) => {
-									setCustomerPassword(e.target.value);
-								}}
-								value={customerPassword}
-							/>
-						</FormGroup>
-
-						<FormGroup id='membershipDate' label='Membership' className='col-md-6'>
-							<Input
-								type='date'
-								onChange={(e) => {
-									setCustomerMembership(e.target.value);
-								}}
-								value={customerMembership}
-							/>
-						</FormGroup>
-						<FormGroup id='type' label='Type' className='col-md-6'>
-							<Input
-								placeholder='Type'
-								onChange={(e) => {
-									setCustomerType(e.target.value);
-								}}
-								value={customerType}
-							/>
-						</FormGroup>
-						<FormGroup id='creditLimit' label='Credit Limit' className='col-md-6'>
-							<Input
-								placeholder='Credit Limit'
-								onChange={(e) => {
-									setcreditLimit(e.target.value);
-								}}
-								value={creditLimit}
-							/>
-						</FormGroup>
-						<FormGroup
-							id='avaliableCredit'
-							label='Available Credit'
-							className='col-md-6'>
-							<Input
-								placeholder='Available Credit'
-								onChange={(e) => {
-									setavaliableCredit(e.target.value);
-								}}
-								value={avaliableCredit}
-							/>
-						</FormGroup>
-						<FormGroup id='mcNumber' label='MC/FF/MX Number' className='col-md-6'>
-							<Input
-								placeholder='MC/FF/MX Number'
-								onChange={(e) => {
-									setmcNumber(e.target.value);
-								}}
-								value={mcNumber}
-							/>
-						</FormGroup>
-						<FormGroup id='usDotNumber' label='USDOT Number' className='col-md-6'>
-							<Input
-								placeholder='USDOT Number'
-								onChange={(e) => {
-									setusDotNumber(e.target.value);
-								}}
-								value={usDotNumber}
-							/>
-						</FormGroup>
-						<FormGroup id='telephone' label='Telephone & Ext.' className='col-md-6'>
-							<Input
-								placeholder='Telephone & Ext.'
-								onChange={(e) => {
-									settelephone(e.target.value);
-								}}
-								value={telephone}
-							/>
-						</FormGroup>
-						<FormGroup id='fax' label='Fax' className='col-md-6'>
-							<Input
-								placeholder='Fax'
-								onChange={(e) => {
-									setFax(e.target.value);
-								}}
-								value={Fax}
-							/>
-						</FormGroup>
-						<FormGroup
-							id='notes'
-							label='Notes'
-							className='col-md-6'
-							formText='* This note used to add customer specific notes to the load notes on your load documents when this customer is added to a load.'>
-							<Textarea
-								placeholder='Notes'
-								onChange={(e) => {
-									setnotes(e.target.value);
-								}}
-								value={notes}
-							/>
-						</FormGroup>
 						<div className='col-md-12'>
 							<Card className='rounded-1 mb-0'>
 								<CardHeader>
 									<CardLabel icon='ReceiptLong'>
-										<CardTitle>Billing Address</CardTitle>
+										<CardTitle>Asset Profile Address</CardTitle>
 									</CardLabel>
 								</CardHeader>
 								<CardBody>
-									<div className='row g-3'>
-										<FormGroup
-											id='streetAddress'
-											label='Address Line'
-											className='col-12'>
-											<Input
-												onChange={(e) => {
-													setAddressLine1(e.target.value);
-												}}
-												value={addressLine1}
-											/>
-										</FormGroup>
-										<FormGroup
-											id='streetAddress2'
-											placeholder='Address Line 2'
-											label='Address Line 2'
-											className='col-12'>
-											<Input
-												onChange={(e) => {
-													setAddressLine2(e.target.value);
-												}}
-												value={addressLine2}
-											/>
-										</FormGroup>
-										<FormGroup id='city' label='City' className='col-md-4'>
-											<Input
-												onChange={(e) => {
-													setCity(e.target.value);
-												}}
-												value={city}
-											/>
-										</FormGroup>
-										<FormGroup
-											id='stateFull'
-											label='State'
-											className='col-md-4'>
-											<Input
-												onChange={(e) => {
-													setState(e.target.value);
-												}}
-												value={state}
-											/>
-										</FormGroup>
-										<FormGroup id='zip' label='Zip' className='col-md-4'>
-											<Input
-												onChange={(e) => {
-													setZip(e.target.value);
-												}}
-												value={zip}
-											/>
-										</FormGroup>
+									<div className='row g-4'>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='makeModel' label='Make/Model'>
+												<Input
+													placeholder='Make/Model'
+													onChange={(e) => {
+														setmakeModel(e.target.value);
+													}}
+													value={makeModel}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='powerUnitNumber'
+												label='Power Unit Number'>
+												<Input
+													placeholder='Power Unit Number'
+													onChange={(e) => {
+														setpowerUnitNumber(e.target.value);
+													}}
+													value={powerUnitNumber}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='engineType'
+												label='Engine Type'>
+												<Input
+													placeholder='Engine Type'
+													onChange={(e) => {
+														setengineType(e.target.value);
+													}}
+													value={engineType}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='transmissionType'
+												label='Transmission Type'>
+												<Input
+													placeholder='Transmission Type'
+													onChange={(e) => {
+														settransmissionType(e.target.value);
+													}}
+													value={transmissionType}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='fuelType' label='Fuel Type'>
+												<Input
+													placeholder='Fuel Type'
+													onChange={(e) => {
+														setfuelType(e.target.value);
+													}}
+													value={fuelType}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='horsepower'
+												label='Horsepower'>
+												<Input
+													placeholder='Horsepower'
+													onChange={(e) => {
+														sethorsepower(e.target.value);
+													}}
+													value={horsepower}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='licensePlate'
+												label='License Plate'>
+												<Input
+													placeholder='License Plate'
+													onChange={(e) => {
+														setlicensePlate(e.target.value);
+													}}
+													value={licensePlate}
+												/>
+											</FormGroup>
+
+											<FormGroup isFloating id='modelYear' label='Model Year'>
+												<Input
+													placeholder='Model Year'
+													onChange={(e) => {
+														setmodelYear(e.target.value);
+													}}
+													value={modelYear}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='vehicleIdNumber'
+												label='Vehicle ID Number'>
+												<Input
+													placeholder='Vehicle ID Number'
+													onChange={(e) => {
+														setvehicleIdNumber(e.target.value);
+													}}
+													value={vehicleIdNumber}
+												/>
+											</FormGroup>
+											<FormGroup isFloating id='assetstatus' label='Status'>
+												<Input
+													placeholder='Status'
+													onChange={(e) => {
+														setassetstatus(e.target.value);
+													}}
+													value={assetstatus}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='insuranceInformation'
+												label='Insurance Information'>
+												<Input
+													placeholder='Insurance Information'
+													onChange={(e) => {
+														setinsuranceInformation(e.target.value);
+													}}
+													value={insuranceInformation}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='registeredStates'
+												label='Registered States'>
+												<Input
+													placeholder='Registered States'
+													onChange={(e) => {
+														setregisteredStates(e.target.value);
+													}}
+													value={registeredStates}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='assetLength' label='Length'>
+												<Input
+													placeholder='Length'
+													onChange={(e) => {
+														setassetLength(e.target.value);
+													}}
+													value={assetLength}
+												/>
+											</FormGroup>
+											<FormGroup isFloating id='assetWidth' label='Width'>
+												<Input
+													placeholder='Width'
+													onChange={(e) => {
+														setassetWidth(e.target.value);
+													}}
+													value={assetWidth}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='assetHeight' label='Height'>
+												<Input
+													placeholder='Height'
+													onChange={(e) => {
+														setassetHeight(e.target.value);
+													}}
+													value={assetHeight}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='numberOfAxles'
+												label='Number of Axles'>
+												<Input
+													placeholder='Number of Axles'
+													onChange={(e) => {
+														setnumberOfAxles(e.target.value);
+													}}
+													value={numberOfAxles}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='unloadedVehicleWeight'
+												label='Unloaded Vehicle Weight'>
+												<Input
+													placeholder='Unloaded Vehicle Weight'
+													onChange={(e) => {
+														setunloadedVehicleWeight(e.target.value);
+													}}
+													value={unloadedVehicleWeight}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='grossVehicleWeight'
+												label='Gross Vehicle Weight'>
+												<Input
+													placeholder='Gross Vehicle Weight'
+													onChange={(e) => {
+														setgrossVehicleWeight(e.target.value);
+													}}
+													value={grossVehicleWeight}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='notes' label='Notes'>
+												<Input
+													placeholder='Notes'
+													onChange={(e) => {
+														setnotes(e.target.value);
+													}}
+													value={notes}
+												/>
+											</FormGroup>
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+							<Card className='rounded-1 mb-0'>
+								<CardHeader>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle>Ownership Info</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody>
+									<div className='row g-4'>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='ownership' label='Ownership'>
+												<Select
+													defaultValue={'Company'}
+													placeholder='Ownership'
+													onChange={(e) => {
+														setownership(e.target.value);
+													}}
+													value={ownership}>
+													<Option key={1} value='Company'>
+														Company
+													</Option>
+													<Option key={2} value='Owner/Operator'>
+														Owner/Operator
+													</Option>
+												</Select>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='powerUnitNumber'
+												label='Power Unit Number'>
+												<Input
+													placeholder='Power Unit Number'
+													onChange={(e) => {
+														setpowerUnitNumber(e.target.value);
+													}}
+													value={powerUnitNumber}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='engineType'
+												label='Engine Type'>
+												<Input
+													placeholder='Engine Type'
+													onChange={(e) => {
+														setengineType(e.target.value);
+													}}
+													value={engineType}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='transmissionType'
+												label='Transmission Type'>
+												<Input
+													placeholder='Transmission Type'
+													onChange={(e) => {
+														settransmissionType(e.target.value);
+													}}
+													value={transmissionType}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='fuelType' label='Fuel Type'>
+												<Input
+													placeholder='Fuel Type'
+													onChange={(e) => {
+														setfuelType(e.target.value);
+													}}
+													value={fuelType}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='horsepower'
+												label='Horsepower'>
+												<Input
+													placeholder='Horsepower'
+													onChange={(e) => {
+														sethorsepower(e.target.value);
+													}}
+													value={horsepower}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='licensePlate'
+												label='License Plate'>
+												<Input
+													placeholder='License Plate'
+													onChange={(e) => {
+														setlicensePlate(e.target.value);
+													}}
+													value={licensePlate}
+												/>
+											</FormGroup>
+
+											<FormGroup isFloating id='modelYear' label='Model Year'>
+												<Input
+													placeholder='Model Year'
+													onChange={(e) => {
+														setmodelYear(e.target.value);
+													}}
+													value={modelYear}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='vehicleIdNumber'
+												label='Vehicle ID Number'>
+												<Input
+													placeholder='Vehicle ID Number'
+													onChange={(e) => {
+														setvehicleIdNumber(e.target.value);
+													}}
+													value={vehicleIdNumber}
+												/>
+											</FormGroup>
+											<FormGroup isFloating id='assetstatus' label='Status'>
+												<Input
+													placeholder='Status'
+													onChange={(e) => {
+														setassetstatus(e.target.value);
+													}}
+													value={assetstatus}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='insuranceInformation'
+												label='Insurance Information'>
+												<Input
+													placeholder='Insurance Information'
+													onChange={(e) => {
+														setinsuranceInformation(e.target.value);
+													}}
+													value={insuranceInformation}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='registeredStates'
+												label='Registered States'>
+												<Input
+													placeholder='Registered States'
+													onChange={(e) => {
+														setregisteredStates(e.target.value);
+													}}
+													value={registeredStates}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='assetLength' label='Length'>
+												<Input
+													placeholder='Length'
+													onChange={(e) => {
+														setassetLength(e.target.value);
+													}}
+													value={assetLength}
+												/>
+											</FormGroup>
+											<FormGroup isFloating id='assetWidth' label='Width'>
+												<Input
+													placeholder='Width'
+													onChange={(e) => {
+														setassetWidth(e.target.value);
+													}}
+													value={assetWidth}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='assetHeight' label='Height'>
+												<Input
+													placeholder='Height'
+													onChange={(e) => {
+														setassetHeight(e.target.value);
+													}}
+													value={assetHeight}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='numberOfAxles'
+												label='Number of Axles'>
+												<Input
+													placeholder='Number of Axles'
+													onChange={(e) => {
+														setnumberOfAxles(e.target.value);
+													}}
+													value={numberOfAxles}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='unloadedVehicleWeight'
+												label='Unloaded Vehicle Weight'>
+												<Input
+													placeholder='Unloaded Vehicle Weight'
+													onChange={(e) => {
+														setunloadedVehicleWeight(e.target.value);
+													}}
+													value={unloadedVehicleWeight}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='grossVehicleWeight'
+												label='Gross Vehicle Weight'>
+												<Input
+													placeholder='Gross Vehicle Weight'
+													onChange={(e) => {
+														setgrossVehicleWeight(e.target.value);
+													}}
+													value={grossVehicleWeight}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup isFloating id='notes' label='Notes'>
+												<Input
+													placeholder='Notes'
+													onChange={(e) => {
+														setnotes(e.target.value);
+													}}
+													value={notes}
+												/>
+											</FormGroup>
+										</div>
 									</div>
 								</CardBody>
 							</Card>
