@@ -200,7 +200,7 @@ const ViewLocation = () => {
 						color='primary'
 						isLight
 						onClick={() => {
-							navigate('/carriers/add-new-carrier');
+							navigate('/locations/add-new-location');
 						}}>
 						Add New Location
 					</Button>

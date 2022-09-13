@@ -157,6 +157,11 @@ const BuildLoad = () => {
 	const [carrierData, setCarrierData] = useState([]);
 	const [isLoading, setisLoading] = useState(false);
 
+	//Data Holders
+	const [driverData, setDriverData] = useState([]);
+	const [powerUnitData, setPowerUnitData] = useState([]);
+	const [trailersData, setTrailersData] = useState([]);
+
 	const TABS = {
 		ACCOUNT_DETAIL: 'Load Details',
 		PASSWORD: 'Password',
@@ -369,9 +374,54 @@ const BuildLoad = () => {
 			});
 		}
 	};
+	const getPowerUnitData = async () => {
+		const q = query(collection(firestoredb, 'powerUnits'));
+		const querySnapshot = await getDocs(q);
+		if (querySnapshot.docs.length < 1) {
+			console.log('No Data');
+		} else {
+			setPowerUnitData([]);
+			querySnapshot.forEach((docRef) => {
+				// doc.data() is never undefined for query doc snapshots
+				// console.log(docRef.id, ' => ', docRef.data());
+				setPowerUnitData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
+			});
+		}
+	};
+	const getTrailerData = async () => {
+		const q = query(collection(firestoredb, 'trailers'));
+		const querySnapshot = await getDocs(q);
+		if (querySnapshot.docs.length < 1) {
+			console.log('No Data');
+		} else {
+			setTrailersData([]);
+			querySnapshot.forEach((docRef) => {
+				// doc.data() is never undefined for query doc snapshots
+				// console.log(docRef.id, ' => ', docRef.data());
+				setTrailersData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
+			});
+		}
+	};
+	const getDriverData = async () => {
+		const q = query(collection(firestoredb, 'drivers'));
+		const querySnapshot = await getDocs(q);
+		if (querySnapshot.docs.length < 1) {
+			console.log('No Data');
+		} else {
+			setDriverData([]);
+			querySnapshot.forEach((docRef) => {
+				// doc.data() is never undefined for query doc snapshots
+				// console.log(docRef.id, ' => ', docRef.data());
+				setDriverData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
+			});
+		}
+	};
 	useEffect(() => {
 		getCustomerData();
 		getCarrierData();
+		getDriverData();
+		getTrailerData();
+		getPowerUnitData();
 	}, []);
 	return (
 		<PageWrapper title={demoPages.editPages.subMenu.editWizard.text}>
@@ -1701,8 +1751,6 @@ const BuildLoad = () => {
 														label='Driver'
 														isFloating>
 														<Select
-															ariaLabel='Board select'
-															placeholder='Select Driver'
 															onChange={formik.handleChange}
 															value={formik.values.carrierDriver}
 															isValid={formik.isValid}
@@ -1710,18 +1758,18 @@ const BuildLoad = () => {
 															invalidFeedback={
 																formik.errors.carrierDriver
 															}>
-															{Object.keys(loadStatusesObj).map(
-																(u) => (
+															{driverData && driverData.length > 0 ? (
+																driverData.map((u) => (
 																	// @ts-ignore
-																	<Option
-																		key={loadStatusesObj[u]}
-																		value={loadStatusesObj[u]}>
+																	<Option key={u.id} value={u.id}>
 																		{
 																			// @ts-ignore
-																			`${loadStatusesObj[u]}`
+																			`${u.data.driverName}`
 																		}
 																	</Option>
-																),
+																))
+															) : (
+																<></>
 															)}
 														</Select>
 													</FormGroup>
@@ -1741,18 +1789,18 @@ const BuildLoad = () => {
 															invalidFeedback={
 																formik.errors.getPowerUnit
 															}>
-															{Object.keys(loadStatusesObj).map(
-																(u) => (
+														{powerUnitData && powerUnitData.length > 0 ? (
+																powerUnitData.map((u) => (
 																	// @ts-ignore
-																	<Option
-																		key={loadStatusesObj[u]}
-																		value={loadStatusesObj[u]}>
+																	<Option key={u.id} value={u.id}>
 																		{
 																			// @ts-ignore
-																			`${loadStatusesObj[u]}`
+																			`${u.data.makeModel}`
 																		}
 																	</Option>
-																),
+																))
+															) : (
+																<></>
 															)}
 														</Select>
 													</FormGroup>
@@ -1772,18 +1820,18 @@ const BuildLoad = () => {
 															invalidFeedback={
 																formik.errors.getTrailer
 															}>
-															{Object.keys(loadStatusesObj).map(
-																(u) => (
+															{trailersData && trailersData.length > 0 ? (
+																trailersData.map((u) => (
 																	// @ts-ignore
-																	<Option
-																		key={loadStatusesObj[u]}
-																		value={loadStatusesObj[u]}>
+																	<Option key={u.id} value={u.id}>
 																		{
 																			// @ts-ignore
-																			`${loadStatusesObj[u]}`
+																			`${u.data.makeModel}`
 																		}
 																	</Option>
-																),
+																))
+															) : (
+																<></>
 															)}
 														</Select>
 													</FormGroup>

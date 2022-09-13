@@ -9,9 +9,8 @@ import SubHeader, {
 	SubheaderSeparator,
 } from '../../layout/SubHeader/SubHeader';
 import Page from '../../layout/Page/Page';
-import { demoPages } from '../../menu';
+import { dashboardMenu, demoPages } from '../../menu';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
-import { getFirstLetter, priceFormat } from '../../helpers/helpers';
 import data from '../../common/data/dummyCustomerData';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import Button from '../../components/bootstrap/Button';
@@ -28,8 +27,7 @@ import PAYMENTS from '../../common/data/enumPaymentMethod';
 import useSortableData from '../../hooks/useSortableData';
 import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
 import Popovers from '../../components/bootstrap/Popovers';
-import CustomerEditModal from '../presentation/crm/CustomerEditModal';
-import { getColorNameWithIndex } from '../../common/data/enumColors';
+
 import useDarkMode from '../../hooks/useDarkMode';
 import Modal, {
 	ModalBody,
@@ -50,23 +48,6 @@ import Select from '../../components/bootstrap/forms/Select';
 
 const ViewPowerUnits = () => {
 	//States
-	const [customerPassword, setCustomerPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-	const [customerName, setCustomerName] = useState('');
-	const [customerEmail, setCustomerEmail] = useState('');
-	const [customerMembership, setCustomerMembership] = useState('');
-	const [addressLine1, setAddressLine1] = useState('');
-	const [addressLine2, setAddressLine2] = useState('');
-	const [city, setCity] = useState('');
-	const [state, setState] = useState('');
-	const [zip, setZip] = useState('');
-	const [customerType, setCustomerType] = useState('');
-	const [creditLimit, setcreditLimit] = useState('');
-	const [avaliableCredit, setavaliableCredit] = useState('');
-	const [mcNumber, setmcNumber] = useState('');
-	const [usDotNumber, setusDotNumber] = useState('');
-	const [Fax, setFax] = useState('');
-	const [telephone, settelephone] = useState('');
 
 	//Asset States
 	const [makeModel, setmakeModel] = useState('');
@@ -90,12 +71,40 @@ const ViewPowerUnits = () => {
 	const [notes, setnotes] = useState('');
 	const [ownership, setownership] = useState('');
 
+	//Ownership info
+	const [purchasedOrLeased, setpurchasedOrLeased] = useState('');
+	const [purchasedOrLeasedFrom, setpurchasedOrLeasedFrom] = useState('');
+	const [soldTo, setsoldTo] = useState('');
+	const [purchasedOrLeasedDate, setpurchasedOrLeasedDate] = useState('');
+	const [soldOrLeaseEndDate, setsoldOrLeaseEndDate] = useState('');
+	const [purchaseLeaseAmount, setpurchaseLeaseAmount] = useState('');
+	const [soldAmount, setsoldAmount] = useState('');
+	const [factoryPrice, setfactoryPrice] = useState('');
+	const [currentValue, setcurrentValue] = useState('');
+
+	//Maintenance and Safety
+	const [licensePlateExpiration, setlicensePlateExpiration] = useState('');
+	const [inspectionExpiration, setinspectionExpiration] = useState('');
+	const [dotExpiration, setdotExpiration] = useState('');
+	const [registrationExpiration, setregistrationExpiration] = useState('');
+	const [insuranceExpiration, setinsuranceExpiration] = useState('');
+	const [estOdometerReading, setestOdometerReading] = useState('');
+	const [lastOilChangeDate, setlastOilChangeDate] = useState('');
+	const [lastOilChangeMileage, setlastOilChangeMileage] = useState('');
+	const [lastTuneUpDate, setlastTuneUpDate] = useState('');
+	const [lastTuneUpMileage, setlastTuneUpMileage] = useState('');
+	const [lastServiceDate, setlastServiceDate] = useState('');
+	const [lastServiceMileage, setlastServiceMileage] = useState('');
+
+	//Integration Ids
+	const [keepTruckinVehicleId, setkeepTruckinVehicleId] = useState('');
+
 	//Data from database
-	const [customerData, setCustomerData] = useState([]);
+	const [powerUnitData, setPowerUnitData] = useState([]);
 	const [count, setCount] = useState(0);
 
-	const [editedCustomerId, setEditedCustomerId] = useState(false);
-	const [isEditingCustomer, setIsEditingCustomer] = useState(false);
+	const [editedPowerUnitId, setEditedPowerUnitId] = useState(false);
+	const [isEditingPower, setIsEditingPowerUnit] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLoadingData, setIsLoadingData] = useState(false);
 
@@ -106,7 +115,6 @@ const ViewPowerUnits = () => {
 
 	const formik = useFormik({
 		initialValues: {
-			customerName: customerName,
 			searchInput: '',
 			payment: Object.keys(PAYMENTS).map((i) => PAYMENTS[i].name),
 			minPrice: '',
@@ -132,102 +140,170 @@ const ViewPowerUnits = () => {
 	const { items, requestSort, getClassNamesFor } = useSortableData(filteredData);
 
 	const [editModalStatus, setEditModalStatus] = useState(false);
-
+	function addInvalidClass(elementId) {
+		var element = document.getElementById(elementId);
+		element.classList.add('is-invalid');
+	}
+	function removeInvalidClass(elementId) {
+		var element = document.getElementById(elementId);
+		element.classList.remove('is-invalid');
+	}
 	function checkValidation() {
-		if (!customerName || customerName == '') {
-			return false;
-		} else if (!customerPassword || customerPassword == '') {
-			return false;
-		} else if (!customerEmail || customerEmail == '') {
-			return false;
-		} else if (!customerMembership || customerMembership == '') {
-			return false;
-		} else if (!addressLine1 || addressLine1 == '') {
-			return false;
-		} else if (!addressLine2 || addressLine2 == '') {
-			return false;
-		} else if (!state || state == '') {
-			return false;
-		} else if (!zip || zip == '') {
-			return false;
+		var errorOccurs = false;
+		if (!powerUnitNumber || powerUnitNumber == '') {
+			addInvalidClass('powerUnitNumber');
+			errorOccurs = true;
+		} else {
+			removeInvalidClass('powerUnitNumber');
+			errorOccurs = false;
 		}
-		return true;
+		if (!makeModel || makeModel == '') {
+			addInvalidClass('makeModel');
+			errorOccurs = true;
+		} else {
+			removeInvalidClass('makeModel');
+			errorOccurs = false;
+		}
+		if (!engineType || engineType == '') {
+			addInvalidClass('engineType');
+			errorOccurs = true;
+		} else {
+			removeInvalidClass('engineType');
+			errorOccurs = false;
+		}
+		if (!licensePlate || licensePlate == '') {
+			addInvalidClass('licensePlate');
+			errorOccurs = true;
+		} else {
+			removeInvalidClass('licensePlate');
+			errorOccurs = false;
+		}
+		return errorOccurs;
 	}
 	//Handlers
 
-	const getCustomerData = async () => {
-		const q = query(collection(firestoredb, 'customers'));
+	const getPowerUnitData = async () => {
+		const q = query(collection(firestoredb, 'powerUnits'));
 		const querySnapshot = await getDocs(q);
 		if (querySnapshot.docs.length < 1) {
 			console.log('No Data');
 			setIsLoadingData(false);
 		} else {
-			setCustomerData([]);
+			setPowerUnitData([]);
 			querySnapshot.forEach((docRef) => {
 				// doc.data() is never undefined for query doc snapshots
 				// console.log(docRef.id, ' => ', docRef.data());
-				setCustomerData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]);
-				// console.log(customerData);
+				setPowerUnitData((prev) => [...prev, { id: docRef.id, data: docRef.data() }]); 
 			});
 			setIsLoadingData(false);
 		}
 	};
-	function setCustomerDataInModal(custData) {
-		if (custData == [] || custData == '' || custData == undefined || !custData) {
-			setCustomerName('');
-			setCustomerPassword('');
-			setCustomerEmail('');
-			setCustomerMembership('');
-			setAddressLine1('');
-			setAddressLine2('');
-			setCity('');
-			setState('');
-			setZip('');
-			setCustomerType('');
-			setcreditLimit('');
-			setavaliableCredit('');
-			setmcNumber('');
-			setusDotNumber('');
-			setFax('');
-			settelephone('');
+	function setPowerUnitDataInModal(puData) {
+		if (puData == [] || puData == '' || puData == undefined || !puData) {
+			setmakeModel('');
+			setpowerUnitNumber('');
+			setengineType('');
+			settransmissionType('');
+			setfuelType('');
+			sethorsepower('');
+			setlicensePlate('');
+			setmodelYear('');
+			setvehicleIdNumber('');
+			setassetstatus('');
+			setinsuranceInformation('');
+			setregisteredStates('');
+			setassetLength('');
+			setassetWidth('');
+			setassetHeight('');
+			setnumberOfAxles('');
+			setunloadedVehicleWeight('');
+			setgrossVehicleWeight('');
 			setnotes('');
+			setownership('');
+			setpurchasedOrLeased('');
+			setpurchasedOrLeasedFrom('');
+			setsoldTo('');
+			setpurchasedOrLeasedDate('');
+			setsoldOrLeaseEndDate('');
+			setpurchaseLeaseAmount('');
+			setsoldAmount('');
+			setfactoryPrice('');
+			setcurrentValue('');
+			setlicensePlateExpiration('');
+			setinspectionExpiration('');
+			setdotExpiration('');
+			setregistrationExpiration('');
+			setinsuranceExpiration('');
+			setestOdometerReading('');
+			setlastOilChangeDate('');
+			setlastOilChangeMileage('');
+			setlastTuneUpDate('');
+			setlastTuneUpMileage('');
+			setlastServiceDate('');
+			setlastServiceMileage('');
+			setkeepTruckinVehicleId('');
 		} else {
-			setCustomerName(custData.name);
-			setCustomerPassword(custData.customerPassword);
-			setCustomerEmail(custData.customerEmail);
-			setCustomerMembership(custData.customerMembership);
-			setAddressLine1(custData.addressLine1);
-			setAddressLine2(custData.addressLine2);
-			setCity(custData.city);
-			setState(custData.state);
-			setZip(custData.zip);
-			setCustomerType(custData.type);
-			setcreditLimit(custData.creditLimit);
-			setavaliableCredit(custData.avaliableCredit);
-			setmcNumber(custData.mcNumber);
-			setusDotNumber(custData.usDotNumber);
-			setFax(custData.Fax);
-			settelephone(custData.telephone);
-			setnotes(custData.notes);
+			setmakeModel(puData.makeModel);
+			setpowerUnitNumber(puData.powerUnitNumber);
+			setengineType(puData.engineType);
+			settransmissionType(puData.transmissionType);
+			setfuelType(puData.fuelType);
+			sethorsepower(puData.horsepower);
+			setlicensePlate(puData.licensePlate);
+			setmodelYear(puData.modelYear);
+			setvehicleIdNumber(puData.vehicleIdNumber);
+			setassetstatus(puData.assetstatus);
+			setinsuranceInformation(puData.insuranceInformation);
+			setregisteredStates(puData.registeredStates);
+			setassetLength(puData.assetLength);
+			setassetWidth(puData.assetWidth);
+			setassetHeight(puData.assetHeight);
+			setnumberOfAxles(puData.numberOfAxles);
+			setunloadedVehicleWeight(puData.unloadedVehicleWeight);
+			setgrossVehicleWeight(puData.grossVehicleWeight);
+			setnotes(puData.notes);
+			setownership(puData.ownership);
+			setpurchasedOrLeased(puData.purchasedOrLeased);
+			setpurchasedOrLeasedFrom(puData.purchasedOrLeasedFrom);
+			setsoldTo(puData.soldTo);
+			setpurchasedOrLeasedDate(puData.purchasedOrLeasedDate);
+			setsoldOrLeaseEndDate(puData.soldOrLeaseEndDate);
+			setpurchaseLeaseAmount(puData.purchaseLeaseAmount);
+			setsoldAmount(puData.soldAmount);
+			setfactoryPrice(puData.factoryPrice);
+			setcurrentValue(puData.currentValue);
+			setlicensePlateExpiration(puData.licensePlateExpiration);
+			setinspectionExpiration(puData.inspectionExpiration);
+			setdotExpiration(puData.dotExpiration);
+			setregistrationExpiration(puData.registrationExpiration);
+			setinsuranceExpiration(puData.inspectionExpiration);
+			setestOdometerReading(puData.estOdometerReading);
+			setlastOilChangeDate(puData.lastOilChangeDate);
+			setlastOilChangeMileage(puData.lastOilChangeMileage);
+			setlastTuneUpDate(puData.lastTuneUpDate);
+			setlastTuneUpMileage(puData.lastTuneUpMileage);
+			setlastServiceDate(puData.lastServiceDate);
+			setlastServiceMileage(puData.lastServiceMileage);
+			setkeepTruckinVehicleId(puData.keepTruckinVehicleId);
 		}
 		setIsLoadingData(false);
 	}
-	const getCustomerDataWithId = async (customerId) => {
+	const getPowerUnitDataWithId = async (powerUnitId) => {
 		// console.log(result[4]);
-		const docRef = doc(firestoredb, 'customers', customerId);
+		const docRef = doc(firestoredb, 'powerUnits', powerUnitId);
 		const docSnap = await getDoc(docRef);
 
 		if (docSnap.exists()) {
 			console.log('Document data:', docSnap.data());
-			setCustomerDataInModal(docSnap.data());
+			setPowerUnitDataInModal(docSnap.data());
 		} else {
 			// doc.data() will be undefined in this case
 			console.log('No such document!');
 			setIsLoadingData(false);
 		}
 	};
-	const addNewCustomer = async () => {
-		if (!checkValidation()) {
+	const addNewPowerUnit = async () => {
+		if (checkValidation()) {
 			showNotification(
 				<span className='d-flex align-items-center'>
 					<Icon icon='Info' size='lg' className='me-1' />
@@ -237,7 +313,7 @@ const ViewPowerUnits = () => {
 			);
 		} else {
 			setIsLoading(true);
-			const docRef = doc(firestoredb, 'customers', customerEmail);
+			const docRef = doc(firestoredb, 'powerUnits', powerUnitNumber);
 			const docSnap = await getDoc(docRef);
 
 			if (docSnap.exists()) {
@@ -248,28 +324,54 @@ const ViewPowerUnits = () => {
 						<Icon icon='Info' size='lg' className='me-1' />
 						<span>Alert!</span>
 					</span>,
-					'Customer Already Existed !',
+					'Power Unit Already Existed !',
 				);
 			} else {
 				// doc.data() will be undefined in this case
 				console.log('No such document!');
-				await setDoc(doc(firestoredb, 'customers', customerEmail), {
-					name: customerName,
-					customerPassword: customerPassword,
-					customerEmail: customerEmail,
-					customerMembership: customerMembership,
-					addressLine1: addressLine1,
-					addressLine2: addressLine2,
-					state: state,
-					city: city,
-					zip: zip,
-					type: customerType,
-					creditLimit: creditLimit,
-					avaliableCredit: avaliableCredit,
-					mcNumber: mcNumber,
-					usDotNumber: usDotNumber,
-					Fax: Fax,
-					telephone: telephone,
+				await setDoc(doc(firestoredb, 'powerUnits', powerUnitNumber), {
+					makeModel: makeModel,
+					powerUnitNumber: powerUnitNumber,
+					engineType: engineType,
+					transmissionType: transmissionType,
+					fuelType: fuelType,
+					horsepower: horsepower,
+					licensePlate: licensePlate,
+					modelYear: modelYear,
+					vehicleIdNumber: vehicleIdNumber,
+					assetstatus: assetstatus,
+					insuranceInformation: insuranceInformation,
+					registeredStates: registeredStates,
+					assetLength: assetLength,
+					assetWidth: assetWidth,
+					assetHeight: assetHeight,
+					numberOfAxles: numberOfAxles,
+					unloadedVehicleWeight: unloadedVehicleWeight,
+					grossVehicleWeight: grossVehicleWeight,
+					ownership: ownership,
+					notes: notes,
+					purchasedOrLeased: purchasedOrLeased,
+					purchasedOrLeasedFrom: purchasedOrLeasedFrom,
+					soldTo: soldTo,
+					purchasedOrLeasedDate: purchasedOrLeasedDate,
+					soldOrLeaseEndDate: soldOrLeaseEndDate,
+					purchaseLeaseAmount: purchaseLeaseAmount,
+					soldAmount: soldAmount,
+					factoryPrice: factoryPrice,
+					currentValue: currentValue,
+					licensePlateExpiration: licensePlateExpiration,
+					inspectionExpiration: inspectionExpiration,
+					dotExpiration: dotExpiration,
+					registrationExpiration: registrationExpiration,
+					ninsuranceExpirationotes: insuranceExpiration,
+					estOdometerReading: estOdometerReading,
+					lastOilChangeDate: lastOilChangeDate,
+					lastOilChangeMileage: lastOilChangeMileage,
+					lastTuneUpDate: lastTuneUpDate,
+					lastTuneUpMileage: lastTuneUpMileage,
+					lastServiceDate: lastServiceDate,
+					lastServiceMileage: lastServiceMileage,
+					keepTruckinVehicleId: keepTruckinVehicleId,
 				})
 					.then((resp) => {
 						console.log(resp);
@@ -280,9 +382,9 @@ const ViewPowerUnits = () => {
 								<Icon icon='Info' size='lg' className='me-1' />
 								<span>Success!</span>
 							</span>,
-							'Customer Added Successfully!',
+							'Power Unit Added Successfully!',
 						);
-						getCustomerData();
+						getPowerUnitData();
 					})
 					.catch((error) => {
 						console.log(error);
@@ -290,8 +392,8 @@ const ViewPowerUnits = () => {
 			}
 		}
 	};
-	const saveEditedCustomer = async (custId) => {
-		console.log(custId);
+	const saveEditedPowerUnit = async (powerUnitId) => {
+		console.log(powerUnitId);
 		if (isLoading) {
 			showNotification(
 				<span className='d-flex align-items-center'>
@@ -301,7 +403,7 @@ const ViewPowerUnits = () => {
 				'Please wait',
 			);
 		} else {
-			if (!checkValidation()) {
+			if (checkValidation()) {
 				showNotification(
 					<span className='d-flex align-items-center'>
 						<Icon icon='Info' size='lg' className='me-1' />
@@ -313,26 +415,52 @@ const ViewPowerUnits = () => {
 				setIsLoading(true);
 
 				// Edit and save document in collection "Carriers"
-				await setDoc(doc(firestoredb, 'customers', custId), {
-					name: customerName,
-					customerPassword: customerPassword,
-					customerEmail: customerEmail,
-					customerMembership: customerMembership,
-					addressLine1: addressLine1,
-					addressLine2: addressLine2,
-					state: state,
-					city: city,
-					zip: zip,
-					type: customerType,
-					creditLimit: creditLimit,
-					avaliableCredit: avaliableCredit,
-					mcNumber: mcNumber,
-					usDotNumber: usDotNumber,
-					Fax: Fax,
-					telephone: telephone,
+				await setDoc(doc(firestoredb, 'powerUnits', powerUnitId), {
+					makeModel: makeModel,
+					powerUnitNumber: powerUnitNumber,
+					engineType: engineType,
+					transmissionType: transmissionType,
+					fuelType: fuelType,
+					horsepower: horsepower,
+					licensePlate: licensePlate,
+					modelYear: modelYear,
+					vehicleIdNumber: vehicleIdNumber,
+					assetstatus: assetstatus,
+					insuranceInformation: insuranceInformation,
+					registeredStates: registeredStates,
+					assetLength: assetLength,
+					assetWidth: assetWidth,
+					assetHeight: assetHeight,
+					numberOfAxles: numberOfAxles,
+					unloadedVehicleWeight: unloadedVehicleWeight,
+					grossVehicleWeight: grossVehicleWeight,
+					ownership: ownership,
+					notes: notes,
+					purchasedOrLeased: purchasedOrLeased,
+					purchasedOrLeasedFrom: purchasedOrLeasedFrom,
+					soldTo: soldTo,
+					purchasedOrLeasedDate: purchasedOrLeasedDate,
+					soldOrLeaseEndDate: soldOrLeaseEndDate,
+					purchaseLeaseAmount: purchaseLeaseAmount,
+					soldAmount: soldAmount,
+					factoryPrice: factoryPrice,
+					currentValue: currentValue,
+					licensePlateExpiration: licensePlateExpiration,
+					inspectionExpiration: inspectionExpiration,
+					dotExpiration: dotExpiration,
+					registrationExpiration: registrationExpiration,
+					ninsuranceExpirationotes: insuranceExpiration,
+					estOdometerReading: estOdometerReading,
+					lastOilChangeDate: lastOilChangeDate,
+					lastOilChangeMileage: lastOilChangeMileage,
+					lastTuneUpDate: lastTuneUpDate,
+					lastTuneUpMileage: lastTuneUpMileage,
+					lastServiceDate: lastServiceDate,
+					lastServiceMileage: lastServiceMileage,
+					keepTruckinVehicleId: keepTruckinVehicleId,
 				})
 					.then(async (docRef) => {
-						console.log('Document has been added successfully');
+						console.log('Power Unit has been added successfully');
 						console.log(docRef);
 						setEditModalStatus(false);
 						setIsLoading(false);
@@ -341,7 +469,7 @@ const ViewPowerUnits = () => {
 								<Icon icon='Info' size='lg' className='me-1' />
 								<span>Success!</span>
 							</span>,
-							'Customer Updated Successfully!',
+							'Power Unit Updated Successfully!',
 						);
 					})
 					.catch((error) => {
@@ -362,13 +490,13 @@ const ViewPowerUnits = () => {
 	useEffect(() => {
 		setIsLoadingData(true);
 
-		getCustomerData();
+		getPowerUnitData();
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 	useEffect(() => {
-		console.log(customerData);
-	}, [customerData]); // eslint-disable-line react-hooks/exhaustive-deps
+		console.log(powerUnitData);
+	}, [powerUnitData]); // eslint-disable-line react-hooks/exhaustive-deps
 	return (
-		<PageWrapper title={demoPages.crm.subMenu.customersList.text}>
+		<PageWrapper title={dashboardMenu.assets.subMenu.viewPowerUnits.text}>
 			<SubHeader>
 				<SubHeaderLeft>
 					<label
@@ -380,7 +508,7 @@ const ViewPowerUnits = () => {
 						id='searchInput'
 						type='search'
 						className='border-0 shadow-none bg-transparent'
-						placeholder='Search customer...'
+						placeholder='Search Power Unit...'
 						onChange={formik.handleChange}
 						value={formik.values.searchInput}
 					/>
@@ -453,8 +581,8 @@ const ViewPowerUnits = () => {
 						color='primary'
 						isLight
 						onClick={(e) => {
-							setIsEditingCustomer(false);
-							setCustomerDataInModal('');
+							setIsEditingPowerUnit(false);
+							setPowerUnitDataInModal('');
 							setEditModalStatus(true);
 						}}>
 						Add New Power Unit
@@ -489,103 +617,60 @@ const ViewPowerUnits = () => {
 										</tr>
 									</thead>
 									<tbody>
-										{customerData &&
-										customerData !== undefined &&
-										customerData != null &&
-										customerData.length > 0 ? (
-											dataPagination(customerData, currentPage, perPage).map(
+										{powerUnitData &&
+										powerUnitData !== undefined &&
+										powerUnitData != null &&
+										powerUnitData.length > 0 ? (
+											dataPagination(powerUnitData, currentPage, perPage).map(
 												(i) => (
 													<tr key={i.id}>
-														<td>
-															<div className='d-flex align-items-center'>
-																<div className='flex-shrink-0'>
-																	<div
-																		className='ratio ratio-1x1 me-3'
-																		style={{ width: 48 }}>
-																		<div
-																			className={`bg-l${
-																				darkModeStatus
-																					? 'o25'
-																					: '25'
-																			}-${getColorNameWithIndex(
-																				currentPage,
-																			)} text-${getColorNameWithIndex(
-																				currentPage,
-																			)} rounded-2 d-flex align-items-center justify-content-center`}>
-																			<span className='fw-bold'>
-																				{i.data.name &&
-																				i.data.name !=
-																					'' ? (
-																					getFirstLetter(
-																						i.data.name,
-																					)
-																				) : (
-																					<></>
-																				)}
-																			</span>
-																		</div>
-																	</div>
-																</div>
-																<div className='flex-grow-1'>
-																	<div className='fs-6 fw-bold'>
-																		{i.data.name}
-																	</div>
-																	<div className='text-muted'>
-																		<Icon icon='Label' />{' '}
-																		<small>
-																			{i.data.type
-																				? i.data.type
-																				: ''}
-																		</small>
-																	</div>
-																</div>
-															</div>
-														</td>
-														<td>
-															<Button
-																isLink
-																color='light'
-																icon='Email'
-																className='text-lowercase'
-																tag='a'
-																href={`mailto:${i.data.customerEmail}`}>
-																{i.data.customerEmail}
-															</Button>
-														</td>
+														<td>{i.data.makeModel}</td>
+														<td>{i.data.powerUnitNumber}</td>
+														<td>{i.data.licensePlate}</td>
+
 														<td>
 															<div>
-																{i.data.customerMembership &&
-																i.data.customerMembership !== '' ? (
+																{i.data.licensePlateExpiration &&
+																i.data.licensePlateExpiration !==
+																	'' ? (
 																	moment(
-																		i.data.customerMembership,
+																		i.data
+																			.licensePlateExpiration,
 																	).format('ll')
 																) : (
 																	<></>
 																)}
 															</div>
+														</td>
+
+														<td>{i.data.vehicleIdNumber}</td>
+														<td>{i.data.ownership}</td>
+														<td>
 															<div>
-																<small className='text-muted'>
-																	{i.data.customerMembership &&
-																	i.data.customerMembership !==
-																		'' ? (
-																		moment(
-																			i.data
-																				.customerMembership,
-																		).fromNow()
-																	) : (
-																		<></>
-																	)}
-																</small>
+																{i.data.inspectionExpiration &&
+																i.data.inspectionExpiration !==
+																	'' ? (
+																	moment(
+																		i.data.inspectionExpiration,
+																	).format('ll')
+																) : (
+																	<></>
+																)}
 															</div>
 														</td>
 														<td>
-															<Icon
-																size='lg'
-																icon={`custom ${i.data.state.toLowerCase()}`}
-															/>{' '}
-															{i.data.state}
+															<div>
+																{i.data.dotExpiration &&
+																i.data.dotExpiration !== '' ? (
+																	moment(
+																		i.data.dotExpiration,
+																	).format('ll')
+																) : (
+																	<></>
+																)}
+															</div>
 														</td>
-														<td>{i.data.zip}</td>
+														<td>{i.data.assetstatus}</td>
 														<td>
 															<Dropdown>
 																<DropdownToggle hasIcon={false}>
@@ -602,7 +687,7 @@ const ViewPowerUnits = () => {
 																			icon='Visibility'
 																			tag='a'
 																			onClick={(e) => {
-																				setIsEditingCustomer(
+																				setIsEditingPowerUnit(
 																					true,
 																				);
 																				setIsLoadingData(
@@ -611,10 +696,10 @@ const ViewPowerUnits = () => {
 																				setEditModalStatus(
 																					true,
 																				);
-																				getCustomerDataWithId(
+																				getPowerUnitDataWithId(
 																					i.id,
 																				);
-																				setEditedCustomerId(
+																				setEditedPowerUnitId(
 																					i.id,
 																				);
 																			}}
@@ -637,7 +722,7 @@ const ViewPowerUnits = () => {
 							</CardBody>
 							<PaginationButtons
 								data={filteredData}
-								label='customers'
+								label='powerUnits'
 								setCurrentPage={setCurrentPage}
 								currentPage={currentPage}
 								perPage={perPage}
@@ -663,9 +748,10 @@ const ViewPowerUnits = () => {
 								<CardBody>
 									<div className='row g-4'>
 										<div className='col-md-6'>
-											<FormGroup isFloating id='makeModel' label='Make/Model'>
+											<FormGroup isFloating label='Make/Model*'>
 												<Input
-													placeholder='Make/Model'
+													id='makeModel'
+													placeholder='Make/Model*'
 													onChange={(e) => {
 														setmakeModel(e.target.value);
 													}}
@@ -675,9 +761,10 @@ const ViewPowerUnits = () => {
 											<FormGroup
 												isFloating
 												id='powerUnitNumber'
-												label='Power Unit Number'>
+												label='Power Unit Number*'>
 												<Input
-													placeholder='Power Unit Number'
+													disabled={isEditingPower}
+													placeholder='Power Unit Number*'
 													onChange={(e) => {
 														setpowerUnitNumber(e.target.value);
 													}}
@@ -689,9 +776,10 @@ const ViewPowerUnits = () => {
 											<FormGroup
 												isFloating
 												id='engineType'
-												label='Engine Type'>
+												label='Engine Type*'>
 												<Input
-													placeholder='Engine Type'
+													disabled={isEditingPower}
+													placeholder='Engine Type*'
 													onChange={(e) => {
 														setengineType(e.target.value);
 													}}
@@ -703,6 +791,7 @@ const ViewPowerUnits = () => {
 												id='transmissionType'
 												label='Transmission Type'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Transmission Type'
 													onChange={(e) => {
 														settransmissionType(e.target.value);
@@ -714,6 +803,7 @@ const ViewPowerUnits = () => {
 										<div className='col-md-6'>
 											<FormGroup isFloating id='fuelType' label='Fuel Type'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Fuel Type'
 													onChange={(e) => {
 														setfuelType(e.target.value);
@@ -726,6 +816,7 @@ const ViewPowerUnits = () => {
 												id='horsepower'
 												label='Horsepower'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Horsepower'
 													onChange={(e) => {
 														sethorsepower(e.target.value);
@@ -738,9 +829,10 @@ const ViewPowerUnits = () => {
 											<FormGroup
 												isFloating
 												id='licensePlate'
-												label='License Plate'>
+												label='License Plate*'>
 												<Input
-													placeholder='License Plate'
+													disabled={isEditingPower}
+													placeholder='License Plate*'
 													onChange={(e) => {
 														setlicensePlate(e.target.value);
 													}}
@@ -750,6 +842,7 @@ const ViewPowerUnits = () => {
 
 											<FormGroup isFloating id='modelYear' label='Model Year'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Model Year'
 													onChange={(e) => {
 														setmodelYear(e.target.value);
@@ -764,6 +857,7 @@ const ViewPowerUnits = () => {
 												id='vehicleIdNumber'
 												label='Vehicle ID Number'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Vehicle ID Number'
 													onChange={(e) => {
 														setvehicleIdNumber(e.target.value);
@@ -773,6 +867,7 @@ const ViewPowerUnits = () => {
 											</FormGroup>
 											<FormGroup isFloating id='assetstatus' label='Status'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Status'
 													onChange={(e) => {
 														setassetstatus(e.target.value);
@@ -787,6 +882,7 @@ const ViewPowerUnits = () => {
 												id='insuranceInformation'
 												label='Insurance Information'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Insurance Information'
 													onChange={(e) => {
 														setinsuranceInformation(e.target.value);
@@ -799,6 +895,7 @@ const ViewPowerUnits = () => {
 												id='registeredStates'
 												label='Registered States'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Registered States'
 													onChange={(e) => {
 														setregisteredStates(e.target.value);
@@ -810,6 +907,7 @@ const ViewPowerUnits = () => {
 										<div className='col-md-6'>
 											<FormGroup isFloating id='assetLength' label='Length'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Length'
 													onChange={(e) => {
 														setassetLength(e.target.value);
@@ -819,6 +917,7 @@ const ViewPowerUnits = () => {
 											</FormGroup>
 											<FormGroup isFloating id='assetWidth' label='Width'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Width'
 													onChange={(e) => {
 														setassetWidth(e.target.value);
@@ -830,6 +929,7 @@ const ViewPowerUnits = () => {
 										<div className='col-md-6'>
 											<FormGroup isFloating id='assetHeight' label='Height'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Height'
 													onChange={(e) => {
 														setassetHeight(e.target.value);
@@ -842,6 +942,7 @@ const ViewPowerUnits = () => {
 												id='numberOfAxles'
 												label='Number of Axles'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Number of Axles'
 													onChange={(e) => {
 														setnumberOfAxles(e.target.value);
@@ -856,6 +957,7 @@ const ViewPowerUnits = () => {
 												id='unloadedVehicleWeight'
 												label='Unloaded Vehicle Weight'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Unloaded Vehicle Weight'
 													onChange={(e) => {
 														setunloadedVehicleWeight(e.target.value);
@@ -868,6 +970,7 @@ const ViewPowerUnits = () => {
 												id='grossVehicleWeight'
 												label='Gross Vehicle Weight'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Gross Vehicle Weight'
 													onChange={(e) => {
 														setgrossVehicleWeight(e.target.value);
@@ -879,6 +982,7 @@ const ViewPowerUnits = () => {
 										<div className='col-md-6'>
 											<FormGroup isFloating id='notes' label='Notes'>
 												<Input
+													disabled={isEditingPower}
 													placeholder='Notes'
 													onChange={(e) => {
 														setnotes(e.target.value);
@@ -901,6 +1005,7 @@ const ViewPowerUnits = () => {
 										<div className='col-md-6'>
 											<FormGroup isFloating id='ownership' label='Ownership'>
 												<Select
+													disabled={isEditingPower}
 													defaultValue={'Company'}
 													placeholder='Ownership'
 													onChange={(e) => {
@@ -917,216 +1022,348 @@ const ViewPowerUnits = () => {
 											</FormGroup>
 											<FormGroup
 												isFloating
-												id='powerUnitNumber'
-												label='Power Unit Number'>
-												<Input
-													placeholder='Power Unit Number'
+												id='purchasedOrLeased'
+												label='Purchased or Leased?'>
+												<Select
+													disabled={isEditingPower}
+													defaultValue={'Purchased'}
+													placeholder='Purchased or Leased?'
 													onChange={(e) => {
-														setpowerUnitNumber(e.target.value);
+														setpurchasedOrLeased(e.target.value);
 													}}
-													value={powerUnitNumber}
+													value={purchasedOrLeased}>
+													<Option key={1} value='Purchased'>
+														Purchased
+													</Option>
+													<Option key={2} value='Leased'>
+														Leased
+													</Option>
+												</Select>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='purchasedOrLeasedFrom'
+												label='Purchased/Leased From'>
+												<Input
+													disabled={isEditingPower}
+													placeholder='Purchased/Leased From'
+													onChange={(e) => {
+														setpurchasedOrLeasedFrom(e.target.value);
+													}}
+													value={purchasedOrLeasedFrom}
+												/>
+											</FormGroup>
+											<FormGroup isFloating id='soldTo' label='Sold To'>
+												<Input
+													disabled={isEditingPower}
+													placeholder='Sold To'
+													onChange={(e) => {
+														setsoldTo(e.target.value);
+													}}
+													value={soldTo}
 												/>
 											</FormGroup>
 										</div>
 										<div className='col-md-6'>
 											<FormGroup
 												isFloating
-												id='engineType'
-												label='Engine Type'>
+												id='purchasedOrLeasedDate'
+												label='Purchase/Lease Date'>
 												<Input
-													placeholder='Engine Type'
+													disabled={isEditingPower}
+													type='date'
+													placeholder='Purchase/Lease Date'
 													onChange={(e) => {
-														setengineType(e.target.value);
+														setpurchasedOrLeasedDate(e.target.value);
 													}}
-													value={engineType}
+													value={purchasedOrLeasedDate}
 												/>
 											</FormGroup>
 											<FormGroup
 												isFloating
-												id='transmissionType'
-												label='Transmission Type'>
+												id='soldOrLeaseEndDate'
+												label='Sold Date/Lease End Date'>
 												<Input
-													placeholder='Transmission Type'
+													disabled={isEditingPower}
+													type='date'
+													placeholder='Sold Date/Lease End Date'
 													onChange={(e) => {
-														settransmissionType(e.target.value);
+														setsoldOrLeaseEndDate(e.target.value);
 													}}
-													value={transmissionType}
-												/>
-											</FormGroup>
-										</div>
-										<div className='col-md-6'>
-											<FormGroup isFloating id='fuelType' label='Fuel Type'>
-												<Input
-													placeholder='Fuel Type'
-													onChange={(e) => {
-														setfuelType(e.target.value);
-													}}
-													value={fuelType}
-												/>
-											</FormGroup>
-											<FormGroup
-												isFloating
-												id='horsepower'
-												label='Horsepower'>
-												<Input
-													placeholder='Horsepower'
-													onChange={(e) => {
-														sethorsepower(e.target.value);
-													}}
-													value={horsepower}
+													value={soldOrLeaseEndDate}
 												/>
 											</FormGroup>
 										</div>
 										<div className='col-md-6'>
 											<FormGroup
 												isFloating
-												id='licensePlate'
-												label='License Plate'>
+												id='purchaseLeaseAmount'
+												label='Purchase/Lease Amount'>
 												<Input
-													placeholder='License Plate'
+													disabled={isEditingPower}
+													placeholder='Purchase/Lease Amount'
 													onChange={(e) => {
-														setlicensePlate(e.target.value);
+														setpurchaseLeaseAmount(e.target.value);
 													}}
-													value={licensePlate}
+													value={purchaseLeaseAmount}
 												/>
 											</FormGroup>
 
-											<FormGroup isFloating id='modelYear' label='Model Year'>
+											<FormGroup
+												isFloating
+												id='soldAmount'
+												label='Sold Amount'>
 												<Input
-													placeholder='Model Year'
+													disabled={isEditingPower}
+													placeholder='Sold Amount'
 													onChange={(e) => {
-														setmodelYear(e.target.value);
+														setsoldAmount(e.target.value);
 													}}
-													value={modelYear}
+													value={soldAmount}
 												/>
 											</FormGroup>
 										</div>
 										<div className='col-md-6'>
 											<FormGroup
 												isFloating
-												id='vehicleIdNumber'
-												label='Vehicle ID Number'>
+												id='factoryPrice'
+												label='Factory Price'>
 												<Input
-													placeholder='Vehicle ID Number'
+													disabled={isEditingPower}
+													placeholder='Factory Price'
 													onChange={(e) => {
-														setvehicleIdNumber(e.target.value);
+														setfactoryPrice(e.target.value);
 													}}
-													value={vehicleIdNumber}
+													value={factoryPrice}
 												/>
 											</FormGroup>
-											<FormGroup isFloating id='assetstatus' label='Status'>
+											<FormGroup
+												isFloating
+												id='currentValue'
+												label='Current Value'>
 												<Input
-													placeholder='Status'
+													disabled={isEditingPower}
+													placeholder='Current Value'
 													onChange={(e) => {
-														setassetstatus(e.target.value);
+														setcurrentValue(e.target.value);
 													}}
-													value={assetstatus}
+													value={currentValue}
+												/>
+											</FormGroup>
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+							<Card className='rounded-1 mb-0'>
+								<CardHeader>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle>Maintenance and Safety</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody>
+									<div className='row g-4'>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='licensePlateExpiration'
+												label='License Plate Expiration'>
+												<Input
+													disabled={isEditingPower}
+													type='date'
+													placeholder='License Plate Expiration'
+													onChange={(e) => {
+														setlicensePlateExpiration(e.target.value);
+													}}
+													value={licensePlateExpiration}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='inspectionExpiration'
+												label='Inspection Expiration'>
+												<Input
+													disabled={isEditingPower}
+													type='date'
+													placeholder='Inspection Expiration'
+													onChange={(e) => {
+														setinspectionExpiration(e.target.value);
+													}}
+													value={inspectionExpiration}
 												/>
 											</FormGroup>
 										</div>
 										<div className='col-md-6'>
 											<FormGroup
 												isFloating
-												id='insuranceInformation'
-												label='Insurance Information'>
+												id='dotExpiration'
+												label='DOT Expiration'>
 												<Input
-													placeholder='Insurance Information'
+													disabled={isEditingPower}
+													type='date'
+													placeholder='DOT Expiration'
 													onChange={(e) => {
-														setinsuranceInformation(e.target.value);
+														setdotExpiration(e.target.value);
 													}}
-													value={insuranceInformation}
+													value={dotExpiration}
 												/>
 											</FormGroup>
 											<FormGroup
 												isFloating
-												id='registeredStates'
-												label='Registered States'>
+												id='registrationExpiration'
+												label='Registration Expiration'>
 												<Input
-													placeholder='Registered States'
+													disabled={isEditingPower}
+													type='date'
+													placeholder='Registration Expiration'
 													onChange={(e) => {
-														setregisteredStates(e.target.value);
+														setregistrationExpiration(e.target.value);
 													}}
-													value={registeredStates}
-												/>
-											</FormGroup>
-										</div>
-										<div className='col-md-6'>
-											<FormGroup isFloating id='assetLength' label='Length'>
-												<Input
-													placeholder='Length'
-													onChange={(e) => {
-														setassetLength(e.target.value);
-													}}
-													value={assetLength}
-												/>
-											</FormGroup>
-											<FormGroup isFloating id='assetWidth' label='Width'>
-												<Input
-													placeholder='Width'
-													onChange={(e) => {
-														setassetWidth(e.target.value);
-													}}
-													value={assetWidth}
-												/>
-											</FormGroup>
-										</div>
-										<div className='col-md-6'>
-											<FormGroup isFloating id='assetHeight' label='Height'>
-												<Input
-													placeholder='Height'
-													onChange={(e) => {
-														setassetHeight(e.target.value);
-													}}
-													value={assetHeight}
-												/>
-											</FormGroup>
-											<FormGroup
-												isFloating
-												id='numberOfAxles'
-												label='Number of Axles'>
-												<Input
-													placeholder='Number of Axles'
-													onChange={(e) => {
-														setnumberOfAxles(e.target.value);
-													}}
-													value={numberOfAxles}
+													value={registrationExpiration}
 												/>
 											</FormGroup>
 										</div>
 										<div className='col-md-6'>
 											<FormGroup
 												isFloating
-												id='unloadedVehicleWeight'
-												label='Unloaded Vehicle Weight'>
+												id='insuranceExpiration'
+												label='Insurance Expiration'>
 												<Input
-													placeholder='Unloaded Vehicle Weight'
+													disabled={isEditingPower}
+													type='date'
+													placeholder='Insurance Expiration'
 													onChange={(e) => {
-														setunloadedVehicleWeight(e.target.value);
+														setinsuranceExpiration(e.target.value);
 													}}
-													value={unloadedVehicleWeight}
+													value={insuranceExpiration}
 												/>
 											</FormGroup>
 											<FormGroup
 												isFloating
-												id='grossVehicleWeight'
-												label='Gross Vehicle Weight'>
+												id='estOdometerReading'
+												label='Est. Odometer Reading'>
 												<Input
-													placeholder='Gross Vehicle Weight'
+													disabled={isEditingPower}
+													placeholder='Est. Odometer Reading'
 													onChange={(e) => {
-														setgrossVehicleWeight(e.target.value);
+														setestOdometerReading(e.target.value);
 													}}
-													value={grossVehicleWeight}
+													value={estOdometerReading}
 												/>
 											</FormGroup>
 										</div>
 										<div className='col-md-6'>
-											<FormGroup isFloating id='notes' label='Notes'>
+											<FormGroup
+												isFloating
+												id='lastOilChangeDate'
+												label='Last Oil Change Date'>
 												<Input
-													placeholder='Notes'
+													disabled={isEditingPower}
+													type='date'
+													placeholder='Last Oil Change Date'
 													onChange={(e) => {
-														setnotes(e.target.value);
+														setlastOilChangeDate(e.target.value);
 													}}
-													value={notes}
+													value={lastOilChangeDate}
+												/>
+											</FormGroup>
+
+											<FormGroup
+												isFloating
+												id='lastOilChangeMileage'
+												label='Last Oil Change Mileage'>
+												<Input
+													disabled={isEditingPower}
+													placeholder='Last Oil Change Mileage'
+													onChange={(e) => {
+														setlastOilChangeMileage(e.target.value);
+													}}
+													value={lastOilChangeMileage}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='lastTuneUpDate'
+												label='Last Tune-up Date'>
+												<Input
+													disabled={isEditingPower}
+													type='date'
+													placeholder='Last Tune-up Date'
+													onChange={(e) => {
+														setlastTuneUpDate(e.target.value);
+													}}
+													value={lastTuneUpDate}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='lastTuneUpMileage'
+												label='Last Tune-up Mileage'>
+												<Input
+													disabled={isEditingPower}
+													placeholder='Last Tune-up Mileage'
+													onChange={(e) => {
+														setlastTuneUpMileage(e.target.value);
+													}}
+													value={lastTuneUpMileage}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='lastServiceDate'
+												label='Last Service Date'>
+												<Input
+													disabled={isEditingPower}
+													type='date'
+													placeholder='Last Service Date'
+													onChange={(e) => {
+														setlastServiceDate(e.target.value);
+													}}
+													value={lastServiceDate}
+												/>
+											</FormGroup>
+											<FormGroup
+												isFloating
+												id='lastServiceMileage'
+												label='Last Service Mileage'>
+												<Input
+													disabled={isEditingPower}
+													placeholder='Last Service Mileage'
+													onChange={(e) => {
+														setlastServiceMileage(e.target.value);
+													}}
+													value={lastServiceMileage}
+												/>
+											</FormGroup>
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+							<Card className='rounded-1 mb-0'>
+								<CardHeader>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle>Integration Ids</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody>
+									<div className='row g-4'>
+										<div className='col-md-6'>
+											<FormGroup
+												isFloating
+												id='keepTruckinVehicleId'
+												label='KeepTruckin Vehicle Id'>
+												<Input
+													disabled={isEditingPower}
+													placeholder='KeepTruckin Vehicle Id'
+													onChange={(e) => {
+														setkeepTruckinVehicleId(e.target.value);
+													}}
+													value={keepTruckinVehicleId}
 												/>
 											</FormGroup>
 										</div>
@@ -1137,8 +1374,8 @@ const ViewPowerUnits = () => {
 					</div>
 				</ModalBody>
 				<ModalFooter className='px-4 pb-4'>
-					{!isEditingCustomer ? (
-						<Button color='info' onClick={addNewCustomer}>
+					{!isEditingPower ? (
+						<Button color='info' onClick={addNewPowerUnit}>
 							{' '}
 							{isLoading && <Spinner isSmall inButton isGrow />}
 							Save
@@ -1147,7 +1384,7 @@ const ViewPowerUnits = () => {
 						<Button
 							color='info'
 							onClick={(e) => {
-								saveEditedCustomer(editedCustomerId);
+								saveEditedPowerUnit(editedPowerUnitId);
 							}}>
 							{' '}
 							{isLoading && <Spinner isSmall inButton isGrow />}
